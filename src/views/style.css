@@ -1,0 +1,461 @@
+@import url();
+*
+{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Ubuntu', sans-serif;
+}
+:root
+{
+    --blue: #287bff;
+    --white1: #d4bdde;
+    --grey: #f5f5f5;
+    --black1: #222;
+    --black2: #999;
+    --white: #fff;
+    --tim2: #6f268f;
+}
+body
+{
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+.container
+{
+    position: relative;
+    height: 100%;
+}
+.navigation
+{
+    position: fixed;
+    width: 300px;
+    height: 100%;
+    background: var(--tim2);
+    border-left: 10px solid var(--tim2);
+    transition: 0.5s;
+    overflow: hidden;
+    /*border-top-right-radius: 20px;*/
+}
+.navigation.active
+{
+    width: 80px;
+}
+.navigation ul
+{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+
+.navigation ul li
+{
+    position: relative;
+    width: 100%;
+    list-style: none;
+    border-top-left-radius: 30px;
+    border-bottom-left-radius: 30px;
+}
+.navigation ul li:hover,
+.navigation ul li.hovered
+{
+    background: var(--white);
+}
+.navigation ul li:nth-child(1)
+{
+    margin-bottom: 60px;
+    pointer-events: none;
+}
+.navigation ul li a
+{
+    position: relative;
+    display: block;
+    width: 100%;
+    display: flex;
+    text-decoration: none;
+    color: var(--white);
+}
+.navigation ul li:hover a,
+.navigation ul li.hovered a
+{
+    color: var(--tim2);
+}
+.navigation ul li a .icon
+{
+    position: relative;
+    display: block;
+    min-width: 60px;
+    height: 60px;
+    line-height: 70px;
+    text-align: center;
+}
+
+.navigation ul li a .icon ion-icon
+{
+    font-size: 1.75em;
+}
+.navigation ul li a .title
+{
+    position: relative;
+    display: block;
+    height: 60px;
+    padding: 0 10px;
+    line-height: 60px;
+    text-align: start;
+    white-space: nowrap;
+}
+
+/* cuvre outside */
+.navigation ul li:hover a::before,
+.navigation ul li.hovered a::before
+{
+    content:'';
+    position: absolute;
+    right: 0;
+    top: -50px;
+    width: 50px;
+    height: 50px;
+    background: transparent;
+    border-radius: 50%;
+    box-shadow: 35px 35px 0 10px var(--white);
+    pointer-events: none;
+}
+.navigation ul li:hover a::after,
+.navigation ul li.hovered a::after
+{
+    content:'';
+    position: absolute;
+    right: 0;
+    bottom: -50px;
+    width: 50px;
+    height: 50px;
+    background: transparent;
+    border-radius: 50%;
+    box-shadow: 35px -35px 0 10px var(--white);
+    pointer-events: none;
+}
+
+/* main */
+.main
+{
+    position: absolute;
+    width: calc(100% - 300px);
+    left: 300px;
+    min-height: 100vh;
+    background: var(--white);
+    transition: 0.5s;
+}
+.main h3
+{
+    margin-top: 20px;
+    margin-left: 30px;
+    color: #6f268f;
+    border-bottom: 2px solid #6f268f; /* Thêm đường kẻ không phải gạch chân dưới h1 */
+    padding-bottom: 5px;
+    display: inline-block;
+}
+.main.active
+{
+    width: calc(100% - 80px);
+    left: 80px;
+}
+.topbar
+{
+    width: 100%;
+    height: 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px;
+
+}
+.toggle
+{
+    position: relative;
+    top: 0;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2.5em;
+    cursor: pointer;
+}
+.search
+{
+    position: relative;
+    width: 400px;
+    margin: 0 10px;
+}
+.search label
+{
+    position: relative;
+    width: 100%;
+}
+.search label input
+{
+    width: 100%;
+    height: 40px;
+    border-radius: 40px;
+    padding: 5px 20px;
+    padding-left: 35px;
+    outline: none;
+    border: 1px solid var(--black2);
+}
+.search label ion-icon
+{
+    position: absolute;
+    top: 0;
+    left: 10px;
+    font-size: 1.2em;
+}
+.logo
+{
+    position: relative;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+}
+.logo img
+{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.cardBox
+{
+    position: relative;
+    width: 100%;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    grid-gap: 30px;
+}
+.cardBox .card
+{
+    position: relative;
+    background: var(--white);
+    padding: 30px;
+    border-radius: 20px;
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
+    box-shadow: 0 7px 25px var(--white1);
+}
+.cardBox .card .numbers
+{
+    position: relative;
+    font-size: 2.5em;
+    font-weight: 500;
+    color: var(--tim2);
+}
+.cardBox .card .cardName
+{
+    color: var(--black2);
+    font-size: 1.1em;
+    margin-top: 5px;
+}
+.cardBox .card .iconBox
+{
+    font-size: 3.5em;
+    color: var(--black2);
+}
+.cardBox .card:hover
+{
+    background: var(--tim2);
+}
+.cardBox .card:hover .numbers,
+.cardBox .card:hover .iconBox,
+.cardBox .card:hover .cardName
+{
+    color: var(--white);
+}
+
+.charts 
+{
+    display: grid;
+    grid-template-columns: 2fr 1fr 2fr;
+    grid-gap: 20px;
+    width: 100%;
+    padding: 20px;
+    padding-top: 0;
+}
+
+.chart
+{
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 7px 25px var(--white1);
+    width: 100%;
+}
+
+.popup-container {
+    position: relative;
+}
+  
+.popup {
+    display: none;
+    position: absolute;
+    margin-left: 20px;
+    background-color: #fff;
+    border: 2px solid #6f268f;
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    z-index: 1;
+}
+  
+.popup a {
+    color: #000;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+  
+.popup a:hover {
+    background-color:#d4bdde;
+}
+  
+.popup-container:hover .popup {
+    display: block;
+}
+
+.addProject {
+    position: relative;
+    margin-left: 20px;
+    margin-top: 10px;
+    padding: 5px;
+    border: 2px solid #6f268f; /* Đổi thành border có màu tương ứng */
+    display: flex;
+    border-radius: 5px; /* Bo tròn góc nút */
+    transition: background-color 0.3s ease, color 0.3s ease;
+    cursor: pointer;
+    background-color: #6f268f;
+    color: #fff; /* Màu chữ ban đầu */
+}
+
+.addProject:hover {
+    background-color: #fff; /* Màu nền khi di chuột qua */
+    color: #6f268f; /* Màu chữ khi di chuột qua */
+}
+
+.addProject .addButton {
+    font-size: 1.5em;
+    padding: 8px 10px;
+}
+
+.addProject .iconAdd {
+    font-size: 2em;
+    margin-right: 2px;
+    margin-top: 4px;
+}
+
+#chart-container {
+    width: 80%; /* Điều chỉnh chiều rộng theo ý muốn */
+    margin-top: 30px;
+    margin-left: auto; /* Căn lề trái tự động */
+    margin-right: auto; /* Căn lề phải tự động */
+    margin-bottom: 100px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease, box-shadow 0.5s ease;
+}
+#chart-name-display{
+    font-style: italic;
+    margin-top: 1rem;
+}
+
+#chart-container.show {
+    opacity: 1;
+    transform: translateY(0);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+#myChart {
+    width: 100%;
+    height: 300px; /* Điều chỉnh độ cao theo ý muốn */
+}
+
+#data-form {
+    list-style-type: none;
+    position: relative;
+    display: flex;
+    flex-wrap: wrap; /* Cho phép các ô chồng lên nhau khi không đủ không gian */
+    
+}
+
+#data-form .input1 {
+    flex: 1; /* Mỗi ô chiếm 50% chiều rộng */
+    margin-right: 15px; /* Khoảng cách giữa các ô */
+}
+
+#data-form label {
+    display: block;
+    font-weight: bold;
+}
+
+#data-form li {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+
+#data-form input,
+#data-form select {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+}
+#data-form {
+    list-style-type: none;
+    margin-top: 20px;
+    margin-right: 30px;
+    margin-left: 30px;
+    position: relative;
+    display: flex;
+    flex-wrap: wrap; /* Cho phép các ô chồng lên nhau khi không đủ không gian */
+    background-color: #f4f4f4;
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.input-row {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.input1 {
+    flex: 1; /* Mỗi ô chiếm 50% chiều rộng */
+    margin-right: 15px; /* Khoảng cách giữa các ô */
+}
+
+.button-row {
+    position: relative;
+    padding: 10px;
+    border: 2px solid #6f268f; /* Đổi thành border có màu tương ứng */
+    display: flex;
+    border-radius: 5px; /* Bo tròn góc nút */
+    transition: background-color 0.3s ease, color 0.3s ease;
+    cursor: pointer;
+    background-color: #6f268f;
+    color: #fff; /* Màu chữ ban đầu */
+}
+
+.button-row:hover {
+    background-color: #fff; /* Màu nền khi di chuột qua */
+    color: #6f268f; /* Màu chữ khi di chuột qua */
+}

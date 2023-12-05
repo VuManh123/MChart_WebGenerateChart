@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MChart</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="navigation">
+            <ul>
+                <li>
+                    <a href="/src/views/index.html">
+                        <span class="icon"><ion-icon name="bar-chart-outline"></ion-icon></span>
+                        <span class="title">MChart</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/src/views/index.html">
+                        <span class="icon"><ion-icon name="home-outline"></ion-icon></span>
+                        <span class="title">Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/src/views/myProject.html">
+                        <span class="icon"><ion-icon name="folder-outline"></ion-icon></span>
+                        <span class="title">My Projects</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/src/views/shareWithMe.html">
+                        <span class="icon"><ion-icon name="share-social-outline"></ion-icon></span>
+                        <span class="title">Shared With Me</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/src/views/recently.html">
+                        <span class="icon"><ion-icon name="time-outline"></ion-icon></span>
+                        <span class="title">Recently</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/src/views/recycleBin.html">
+                        <span class="icon"><ion-icon name="trash-bin-outline"></ion-icon></span>
+                        <span class="title">Recycle Bin</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/src/views/help.html">
+                        <span class="icon"><ion-icon name="help-circle-outline"></ion-icon></span>
+                        <span class="title">Help</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/src/views/settings.html">
+                        <span class="icon"><ion-icon name="settings-outline"></ion-icon></span>
+                        <span class="title">Settings</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <span class="icon"><ion-icon name="log-out-outline"></ion-icon></span>
+                        <span class="title">Sign Out</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- main -->
+        <div class="main">
+            <div class="topbar">
+                <div class="toggle">
+                    <ion-icon name="menu-outline"></ion-icon>
+                </div>
+                <div class="search">
+                    <label>
+                        <input type="text" placeholder="Enter infomation that you want ...">
+                        <ion-icon name="search-outline"></ion-icon>
+                    </label>
+                </div>
+
+                <!-- logo image -->
+                <div class="logo">
+                    <img src="images/Logo.png">
+                </div>
+            </div>
+
+            <h3>Enter infomation and Show chart:</h3>
+
+            <form id="data-form">
+                <div class="input-row">
+                    <div class="input1">
+                        <li>
+                            <label for="chart-name">Chart name:</label>
+                            <input type="text" id="chart-name" required>
+                        </li>
+                        <li>
+                            <label for="chart-type">Chart type:</label>
+                            <select id="chart-type" required>
+                                <option value="line">Line Chart</option>
+                                <option value="bar">Bar Chart</option>
+                                <option value="pie">Pie Chart</option>
+                                <option value="doughnut">Dought Chart</option>
+                                <option value="radar">Radar Chart</option>
+                                <option value="polarArea">Polar Area Chart</option>
+                                <!-- Thêm các loại biểu đồ khác nếu cần -->
+                            </select>
+                        </li>
+                    </div>
+                    <div class="input1">
+                        <li>
+                            <label for="data-input">Enter data (separated by commas):</label>
+                            <input type="text" id="data-input" required>
+                        </li>
+                        <li>
+                            <label for="label-input">Enter label (separated by commas):</label>
+                            <input type="text" id="label-input" required>
+                        </li>
+                    </div>
+                </div>
+                <div>
+                    <button class="button-row" type="button" onclick="updateChart()">Show Chart</button>
+                </div>
+            </form>
+            
+
+            <div id="chart-container">
+                <canvas id="myChart"></canvas>
+                <p id="chart-name-display"></p>
+            </div>
+            
+        </div>
+    </div>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../models/chart.js"></script>
+
+    <script>
+        // Day thanh taskbar vao
+        let toggle = document.querySelector('.toggle');
+        let navigation = document.querySelector('.navigation');
+        let main = document.querySelector('.main');
+
+        toggle.onclick = function(){
+            navigation.classList.toggle('active')
+            main.classList.toggle('active')
+        }
+        // Co dinh hover cho thanh taskbar
+        let list = document.querySelectorAll('.navigation li');
+        function activeLink(){
+            list.forEach((item) =>
+            item.classList.remove('hovered'));
+            this.classList.add('hovered');
+        }
+        list.forEach((item) =>
+        item.addEventListener('mouseover', activeLink));
+
+        // Hàm cập nhật biểu đồ
+        function updateChart() {
+            var chartName = document.getElementById('chart-name').value;
+            var chartType = document.getElementById('chart-type').value;
+            var inputData = document.getElementById('data-input').value;
+            var labelInput = document.getElementById('label-input').value;
+
+            var data = inputData.split(',').map(Number);
+            var labels = labelInput.split(',');
+
+            // Lấy tham chiếu đến canvas và vẽ biểu đồ
+            var ctx = document.getElementById('myChart').getContext('2d');
+            var myChart = new Chart(ctx, {
+                type: chartType,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: chartName,
+                        data: data,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.2)',
+                            'rgba(255, 159, 64, 0.2)',
+                            'rgba(255, 205, 86, 0.2)',
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(54, 162, 235, 0.2)',
+                            'rgba(153, 102, 255, 0.2)',
+                            'rgba(201, 203, 207, 0.2)'
+                        ],
+                        borderColor: [
+                            'rgb(255, 99, 132)',
+                            'rgb(255, 159, 64)',
+                            'rgb(255, 205, 86)',
+                            'rgb(75, 192, 192)',
+                            'rgb(54, 162, 235)',
+                            'rgb(153, 102, 255)',
+                            'rgb(201, 203, 207)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: '#555',
+                                fontSize: 12
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#555',
+                                fontSize: 12
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Hiển thị tên biểu đồ dưới biểu đồ
+            document.getElementById('chart-name-display').innerText = `Biểu đồ: ${chartName}`;
+
+            // Kích hoạt animation cho biểu đồ và tên biểu đồ
+            document.getElementById('chart-container').classList.add('show');
+            document.getElementById('chart-name-display').classList.add('show');
+        }
+    </script>
+</body>
+</html>
