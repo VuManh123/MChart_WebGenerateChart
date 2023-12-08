@@ -3,164 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biểu đồ dữ liệu</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            text-align: center;
-            margin: 50px;
-            background-color: #f4f4f4;
-        }
-
-        h1 {
-            color: #333;
-        }
-
-        #chart-container {
-            width: 80%;
-            margin: auto;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.5s ease, transform 0.5s ease, box-shadow 0.5s ease;
-        }
-
-        #chart-container.show {
-            opacity: 1;
-            transform: translateY(0);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-        }
-
-        #data-form {
-            margin-top: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        #data-form label {
-            margin-bottom: 5px;
-        }
-
-        input, select {
-            padding: 8px;
-            margin-bottom: 10px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        button {
-            background-color: #4caf50;
-            color: #fff;
-            padding: 10px;
-            cursor: pointer;
-            border: none;
-            border-radius: 4px;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-
-        #chart-name-display {
-            margin-top: 10px;
-            font-style: italic;
-            opacity: 0;
-            transform: translateY(10px);
-            transition: opacity 0.5s ease, transform 0.5s ease;
-        }
-
-        #chart-name-display.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    </style>
+    <title>Animated Bubble Chart</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-
-    <h1>Nhập thông tin và Hiển thị Biểu đồ</h1>
-
-    <form id="data-form">
-        <label for="chart-name">Tên Biểu đồ:</label>
-        <input type="text" id="chart-name" required>
-        
-        <label for="chart-type">Loại Biểu đồ:</label>
-        <select id="chart-type" required>
-            <option value="bar">Cột</option>
-            <option value="line">Đường</option>
-            <!-- Thêm các loại biểu đồ khác nếu cần -->
-        </select>
-
-        <label for="data-input">Nhập dữ liệu (phân cách bằng dấu phẩy):</label>
-        <input type="text" id="data-input" required>
-
-        <label for="label-input">Nhập nhãn (phân cách bằng dấu phẩy):</label>
-        <input type="text" id="label-input" required>
-
-        <button type="button" onclick="updateChart()">Cập nhật Biểu đồ</button>
-    </form>
-
-    <div id="chart-container">
-        <canvas id="myChart"></canvas>
-        <p id="chart-name-display"></p>
+    <!-- Hình ảnh làm background -->
+    <div class="background">
+        <!-- Thẻ canvas cho biểu đồ -->
+        <canvas id="bubbleChart" width="800" height="400"></canvas>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        // Hàm cập nhật biểu đồ
-        function updateChart() {
-            var chartName = document.getElementById('chart-name').value;
-            var chartType = document.getElementById('chart-type').value;
-            var inputData = document.getElementById('data-input').value;
-            var labelInput = document.getElementById('label-input').value;
-
-            var data = inputData.split(',').map(Number);
-            var labels = labelInput.split(',');
-
-            // Lấy tham chiếu đến canvas và vẽ biểu đồ
-            var ctx = document.getElementById('myChart').getContext('2d');
-            var myChart = new Chart(ctx, {
-                type: chartType,
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: chartName,
-                        data: data,
-                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                color: '#555',
-                                fontSize: 12
-                            }
-                        },
-                        x: {
-                            ticks: {
-                                color: '#555',
-                                fontSize: 12
-                            }
-                        }
-                    }
-                }
-            });
-
-            // Hiển thị tên biểu đồ dưới biểu đồ
-            document.getElementById('chart-name-display').innerText = `Biểu đồ: ${chartName}`;
-
-            // Kích hoạt animation cho biểu đồ và tên biểu đồ
-            document.getElementById('chart-container').classList.add('show');
-            document.getElementById('chart-name-display').classList.add('show');
-        }
-    </script>
-
+    <script src="../models/app.js"></script>
 </body>
 </html>

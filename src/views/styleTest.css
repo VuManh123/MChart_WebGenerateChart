@@ -1,0 +1,22 @@
+body {
+    margin: 0;
+    overflow: hidden; /* Ngăn chặn cuộn trang */
+}
+
+.background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('background.jpg'); /* Đường dẫn đến hình ảnh background */
+    background-size: cover;
+    background-position: center;
+    z-index: -1; /* Đặt về mức thấp hơn để không che phủ các phần tử khác */
+}
+
+#bubbleChart {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
