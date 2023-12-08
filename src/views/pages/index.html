@@ -4,56 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MChart</title>
-    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="../styles/style.css">
 </head>
 <body>
     <div class="container">
         <div class="navigation">
             <ul>
                 <li>
-                    <a href="/src/views/index.html">
+                    <a href="#">
                         <span class="icon"><ion-icon name="bar-chart-outline"></ion-icon></span>
                         <span class="title">MChart</span>
                     </a>
                 </li>
                 <li>
-                    <a href="/src/views/index.html">
+                    <a href="#">
                         <span class="icon"><ion-icon name="home-outline"></ion-icon></span>
                         <span class="title">Dashboard</span>
                     </a>
                 </li>
                 <li>
-                    <a href="#">
+                    <a href="./myProject.html">
                         <span class="icon"><ion-icon name="folder-outline"></ion-icon></span>
                         <span class="title">My Projects</span>
                     </a>
                 </li>
                 <li>
-                    <a href="/src/views/shareWithMe.html">
+                    <a href="./shareWithMe.html">
                         <span class="icon"><ion-icon name="share-social-outline"></ion-icon></span>
                         <span class="title">Shared With Me</span>
                     </a>
                 </li>
                 <li>
-                    <a href="/src/views/recently.html">
+                    <a href="./recently.html">
                         <span class="icon"><ion-icon name="time-outline"></ion-icon></span>
                         <span class="title">Recently</span>
                     </a>
                 </li>
                 <li>
-                    <a href="/src/views/recycleBin.html">
+                    <a href="./recycleBin.html">
                         <span class="icon"><ion-icon name="trash-bin-outline"></ion-icon></span>
                         <span class="title">Recycle Bin</span>
                     </a>
                 </li>
                 <li>
-                    <a href="/src/views/help.html">
+                    <a href="./help.html">
                         <span class="icon"><ion-icon name="help-circle-outline"></ion-icon></span>
                         <span class="title">Help</span>
                     </a>
                 </li>
                 <li>
-                    <a href="/src/views/settings.html">
+                    <a href="./settings.html">
                         <span class="icon"><ion-icon name="settings-outline"></ion-icon></span>
                         <span class="title">Settings</span>
                     </a>
@@ -82,36 +82,72 @@
 
                 <!-- logo image -->
                 <div class="logo">
-                    <img src="images/Logo.png">
+                    <img src="../images/Logo.png">
                 </div>
             </div>
-            <div class="popup-container">
-                <button class="addProject" onclick="togglePopup()">
-                  <div class="iconAdd">
-                    <ion-icon name="add-outline"></ion-icon>
-                  </div>
-                  <div class="addButton">
-                    <div>Add New</div>
-                  </div>
-                </button>
-                <div class="popup" id="popup">
-                  <a href="#">Add a new Project</a>
-                  <a href="/src/views/addChart.html">Add a new Chart</a>
+            <!-- Cards-->
+            <div class="cardBox">
+                <div class="card">
+                    <div>
+                        <div class="numbers">50</div>
+                        <div class="cardName">My projects</div>
+                    </div>
+                    <div class="iconBox">
+                        <ion-icon name="albums-outline"></ion-icon>
+                    </div>
                 </div>
-
-                <!-- Danh sách project -->
-                <div class="project-list">
-                    <!-- Các project được thêm vào đây bằng JavaScript -->
+                <div class="card">
+                    <div>
+                        <div class="numbers">99</div>
+                        <div class="cardName">My charts</div>
+                    </div>
+                    <div class="iconBox">
+                        <ion-icon name="pie-chart-outline"></ion-icon>
+                    </div>
+                </div>
+                <div class="card">
+                    <div>
+                        <div class="numbers">39</div>
+                        <div class="cardName">Shared With Me</div>
+                    </div>
+                    <div class="iconBox">
+                        <ion-icon name="share-outline"></ion-icon>
+                    </div>
+                </div>
+                <div class="card">
+                    <div>
+                        <div class="numbers">80</div>
+                        <div class="cardName">My Share</div>
+                    </div>
+                    <div class="iconBox">
+                        <ion-icon name="share-social-outline"></ion-icon>
+                    </div>
                 </div>
             </div>
-        </div>
+            <!-- Charts -->
+            <div class="charts">
+                <div class="chart">
+                    <h2>Phân tích dữ liệu lượng mưa năm 2023</h2>
+                    <canvas id="barChart"></canvas>
+                </div>
+                <div class="chart" id="m">
+                    <h2>Thống kê học sinh</h2>
+                    <canvas id="doughnut"></canvas>
+                </div>
+                <div class="chart" id="m">
+                    <h2>Thống kê màu sắc yêu thích</h2>
+                    <canvas id="line"></canvas>
+                </div>
+            </div>
+            <div class="chart1">
+            </div>
             
         </div>
     </div>
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="../models/chart.js"></script>
+    <script src="../../models/chart.js"></script>
 
     <script>
         // Day thanh taskbar vao
@@ -132,7 +168,6 @@
         }
         list.forEach((item) =>
         item.addEventListener('mouseover', activeLink));
-        
     </script>
 </body>
 </html>
