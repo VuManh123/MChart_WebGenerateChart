@@ -304,14 +304,12 @@ body
     display: none;
     position: absolute;
     margin-left: 20px;
-    background-color: #fff;
-    border: 2px solid #6f268f;
-    border-radius: 10px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    border-radius: 5px;
-    z-index: 1;
+    border: 1px solid #6f268f;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background: #f4f4f4;
 }
-  
+
 .popup a {
     color: #000;
     padding: 12px 16px;
@@ -321,6 +319,7 @@ body
   
 .popup a:hover {
     background-color:#d4bdde;
+    border-radius: 8px;
 }
   
 .popup-container:hover .popup {
@@ -426,7 +425,7 @@ body
     display: flex;
     flex-wrap: wrap; /* Cho phép các ô chồng lên nhau khi không đủ không gian */
     background-color: #f4f4f4;
-    border: 1px solid #ccc;
+    border: 1px solid var(--tim2);
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -460,3 +459,61 @@ body
     color: #6f268f; /* Màu chữ khi di chuột qua */
 }
 
+.button-save {
+    position: relative;
+    padding: 10px;
+    margin-left: 10px;
+    border: 2px solid #6f268f; /* Đổi thành border có màu tương ứng */
+    display: flex;
+    border-radius: 5px; /* Bo tròn góc nút */
+    transition: background-color 0.3s ease, color 0.3s ease;
+    cursor: pointer;
+    background-color: #6f268f;
+    color: #fff; /* Màu chữ ban đầu */
+}
+
+.button-save:hover {
+    background-color: #fff; /* Màu nền khi di chuột qua */
+    color: #6f268f; /* Màu chữ khi di chuột qua */
+}
+
+.popup-content {
+    margin: 0px 0 0 188px;
+    display: none;
+    position: absolute;
+    background-color: #f4f4f4;
+    border: 1px solid var(--tim2);
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    z-index: 1;
+}
+.popup-content label {
+    font-weight: bold;
+    color: var(--tim2);
+}
+.popup-content label, .popup-content textarea, .popup-content button {
+    display: block;
+    margin-bottom: 10px;
+    width: 100%; /* Rộng 100% cho ô text */
+}
+
+.popup-content input[type="text"],
+.popup-content textarea {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px; /* Góc bo tròn */
+    box-sizing: border-box;
+}
+.popup-content label[for="projectDescription"] {
+    margin-top: 10px;
+}
+/* Thêm style cho nút đóng */
+.popup-content .close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    font-size: 18px;
+    color: #555;
+}

@@ -7,10 +7,17 @@ var sql = require('mssql');
 var consoleTable = require('console.table');
 const fs = require('fs');
 const { connect } = require('http2');
+const session = require('express-session');
 
 // Sử dụng body-parser middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(express.json());
+app.use(session({
+    secret: 'manhvu',
+    resave: true,
+    saveUninitialized: true
+}));
 
 // Cấu hình đường dẫn cho các tệp HTML
 const htmlDir = path.join(__dirname, 'views', 'pages');
@@ -82,6 +89,7 @@ app.post('/login', function(req, res) {
     } else {
       // Kiểm tra kết quả truy vấn
       if (result.recordset.length > 0) {
+        req.session.userName = username;
         // Đóng kết nối configForLogIn sau khi đăng nhập thành công
         sql.close(function(err) {
           if (err) {
@@ -118,7 +126,7 @@ app.post('/login', function(req, res) {
           }
         });
 
-        res.json({ success: true, message: "Login successful" });
+        res.json({ success: true, message: "Login successful", userName: username });
       } else {
         res.json({ success: false, message: "Invalid username or password" });
       }
@@ -170,4 +178,11 @@ app.get('/projects', (req, res) => {
       console.log('Error executing SQL query:', error);
       res.status(500).send('Internal Server Error');
     });
+});
+// Test session
+app.get('/otherRoute', function(req, res) {
+  const userName = req.session.userName;
+  console.log(req.session); // In ra session để kiểm tra
+  // Thực hiện các thao tác khác với userName
+  res.json({ success: true, message: "Other route", userName: userName });
 });

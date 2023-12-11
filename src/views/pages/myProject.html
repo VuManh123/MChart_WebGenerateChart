@@ -95,16 +95,34 @@
                   </div>
                 </button>
                 <div class="popup" id="popup">
-                  <a href="#">Add a new Project</a>
+                  <a href="#" onclick="openPopup()">Add a new Project</a>
                   <a href="./addChart.html">Add a new Chart</a>
                 </div>
 
-                <!-- Danh sách project -->
-                <div class="project-list">
-                    <!-- Các project được thêm vào đây bằng JavaScript -->
+                <!-- Popup content -->
+                <div class="popup-content" id="projectPopup">
+                    <span class="close" onclick="closePopup()">&times;</span>
+                    <label for="projectName">Project Name:</label>
+                    <input type="text" id="projectName" placeholder="Enter project name">
+
+                    <label for="projectDescription">Project Description:</label>
+                    <textarea id="projectDescription" placeholder="Enter project description"></textarea>
+
+                    <button class="button-row" onclick="saveProject()">Save Project</button>
                 </div>
             </div>
+
+            <!-- Danh sách project -->
+            <div class="project-list">
+                <!-- Các project được thêm vào đây bằng JavaScript -->
+            </div>
+
+            <!-- Danh sách chart -->
+            <div class="chart-list">
+                <!-- Các project được thêm vào đây bằng JavaScript -->
+            </div>
         </div>
+
             
         </div>
     </div>
@@ -120,6 +138,26 @@
                 // Thực hiện các bước đăng xuất ở đây (ví dụ: chuyển hướng đến trang đăng nhập)
                 window.location.href = "login.html";
             }
+        }
+
+        function openPopup() {
+            var projectPopup = document.getElementById("projectPopup");
+            projectPopup.style.display = "block";
+        }
+
+        function closePopup() {
+            var projectPopup = document.getElementById("projectPopup");
+            projectPopup.style.display = "none";
+        }
+
+        function saveProject() {
+            var projectName = document.getElementById("projectName").value;
+            var projectDescription = document.getElementById("projectDescription").value;
+
+            // Thực hiện các bước lưu dự án ở đây (ví dụ: gửi dữ liệu đến server)
+
+            // Sau khi lưu xong, đóng popup
+            closePopup();
         }
     </script>
 
