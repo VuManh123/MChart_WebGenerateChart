@@ -7,13 +7,15 @@ var sql = require('mssql');
 var consoleTable = require('console.table');
 const fs = require('fs');
 const { connect } = require('http2');
-app.use( express.static('public'));
+
 // Sử dụng body-parser middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
 // Cấu hình đường dẫn cho các tệp HTML
-const htmlDir = path.join(__dirname, 'views');
-// Thiết lập Db
+const htmlDir = path.join(__dirname, 'views', 'pages');
+
+// Thiết lập Db cho trang đăng nhập
 const configForLogIn = {
   server: 'MANHVU',
   database: 'MChart',
@@ -39,6 +41,8 @@ sql.connect(configForLogIn, function(err) {
     console.log("Connected to database to get Users table info");
   }
 });
+
+// Endpoint đăng xuất
 app.post('/logout', function(req, res) {
   // Ngắt kết nối config
   sql.close(function(err) {
@@ -61,13 +65,13 @@ app.post('/logout', function(req, res) {
   // Chuyển hướng người dùng về trang đăng nhập
   res.redirect('/login.html');
 });
-
+// Endpoint đăng nhập
 app.post('/login', function(req, res) {
   const username = req.body.username;
   const password = req.body.password;
 
   // Tạo truy vấn SQL để kiểm tra thông tin đăng nhập
-  const query = `SELECT * FROM Users WHERE username LIKE '%${username}%' AND password LIKE '%${password}%'`;
+  const query = `SELECT * FROM Users WHERE UserName LIKE '%${username}%' AND Password LIKE '%${password}%'`;
 
   // Thực hiện truy vấn SQL
   const request = new sql.Request();
@@ -90,7 +94,7 @@ app.post('/login', function(req, res) {
         // Thiết lập Db để thực hiện các chức năng khác
         const config = {
           server: 'MANHVU',
-          database: 'CarRental',
+          database: 'MChart',
           port: 1433,
           authentication: {
             type: 'default',
@@ -121,13 +125,17 @@ app.post('/login', function(req, res) {
     }
   });
 });
+
 // Reset lai cac ket noi khi dang xuat
 module.exports = connect ;
 // Định vị thư mục chứa các tệp tĩnh
-app.use('/assets', express.static(path.join(__dirname, 'views', 'assets')));
+app.use('/styles', express.static(path.join(__dirname, 'views', 'styles')));
+app.use('/models', express.static(path.join(__dirname, 'models')));
+app.use('/controller', express.static(path.join(__dirname, 'controller')));
+app.use('/images', express.static(path.join(__dirname, 'views', 'images')));
 
 // Định vị thư mục chứa các tệp HTML
-app.set('views', path.join(__dirname, 'views'));
+app.set('pages', path.join(__dirname, 'pages'));
 
 app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html');
@@ -142,4 +150,24 @@ app.use((req, res, next) => {
       next();
     }
   });
+});
+
+// Khởi động máy chủ
+app.listen(5000, () => {
+  console.log('Server is running on port 5000');
+});
+
+// Truy vấn project, chart
+app.get('/projects', (req, res) => {
+  // Thực hiện truy vấn SQL để lấy thông tin về các loại xe
+  const query = 'SELECT * FROM Projects';
+  sql.query(query)
+    .then((result) => {
+      // Gửi kết quả về cho máy khách
+      res.json(result.recordset);
+    })
+    .catch((error) => {
+      console.log('Error executing SQL query:', error);
+      res.status(500).send('Internal Server Error');
+    });
 });

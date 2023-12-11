@@ -9,14 +9,14 @@
 <body>
     <!-- Login -->
     <div class="wrapper" id="loginWrapper">
-        <form action="" id="loginForm">
+        <form action="#" id="loginForm">
             <h1>Login</h1>
             <div class="input-box">
-                <input type="text" placeholder="Username" required> 
+                <input type="text" placeholder="Username" required id="userNameInput"> 
                 <ion-icon name="person-outline"></ion-icon>
             </div>
             <div class="input-box">
-                <input type="text" placeholder="Password" required>
+                <input type="password" placeholder="Password" required id="passwordInput">
                 <ion-icon name="lock-closed-outline"></ion-icon>
             </div>
 
@@ -72,6 +72,7 @@
     <script src="../../models/app.js"></script>
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script>
         // Lấy các phần tử cần thao tác
         const loginWrapper = document.getElementById('loginWrapper');
@@ -99,5 +100,38 @@
             switchForm(loginWrapper, registerWrapper);
         });
     </script>
+
+<script>
+    // Bắt sự kiện submit form
+    $('#loginForm').submit(function(event) {
+        event.preventDefault(); // Ngăn chặn sự kiện mặc định của form
+        const username = $('#userNameInput').val();
+        const password = $('#passwordInput').val();
+    // Gửi yêu cầu đăng nhập đến máy chủ
+        $.ajax({
+            url: '/login',
+            type: 'POST',
+            data: {
+            username: username,
+            password: password
+            },
+            success: function(response) {
+            // Xử lý phản hồi từ máy chủ sau khi đăng nhập thành công
+            // Ví dụ: Chuyển hướng đến trang chính
+            if (response.success) {
+                console.log("Login successful");
+                window.location.href = 'index.html';
+            } else {
+                alert(response.message);
+            }
+            },
+            error: function() {
+            console.log("Login fail");
+            // Xử lý khi xảy ra lỗi trong quá trình đăng nhập
+            alert('Đăng nhập không thành công. Vui lòng kiểm tra lại thông tin đăng nhập.');
+            }
+        });
+    });
+  </script>
 </body>
 </html>

@@ -11,11 +11,9 @@ CREATE TABLE Users (
 
 INSERT INTO Users (UserName, Password, Email)
 VALUES
-    ('User1', 'pass1', 'user1@example.com'),
-    ('User2', 'pass2', 'user2@example.com'),
-    ('User3', 'pass3', 'user3@example.com'),
-    ('User4', 'pass4', 'user4@example.com'),
-    ('User5', 'pass5', 'user5@example.com');
+    ('user1', 'password1', 'user1@gmail.com'),
+    ('user2', 'password2', 'user2@gmail.com'),
+    ('user3', 'password3', 'user3@gmail.com')
 
 -- 2. Tạo bảng projects
 CREATE TABLE Projects (
@@ -28,8 +26,8 @@ CREATE TABLE Projects (
 );
 
 -- Thêm một dự án mới
-INSERT INTO Projects (ProjectName, Description)
-VALUES ('Project A', 'Description of Project A');
+INSERT INTO Projects (ProjectName, Description, UserID)
+VALUES ('Project A', 'Description of Project A', 'MU00001');
 
 -- 3. Tạo bảng biêu đồ trong các projects
 CREATE TABLE Charts (
@@ -43,6 +41,8 @@ CREATE TABLE Charts (
 
 -- 4. Tao bang share project
 CREATE TABLE ProjectShares (
+	STT INT IDENTITY(1, 1),
+    ID AS CONVERT(NVARCHAR(12), 'PS' + RIGHT('0000000' + CAST(STT AS VARCHAR(5)), 5)) PERSISTED PRIMARY KEY,
     ProjectID NVARCHAR(10) FOREIGN KEY REFERENCES Projects(ProjectID),
     SharedByUserID NVARCHAR(10) FOREIGN KEY REFERENCES Users(UserID),
     SharedWithUserID NVARCHAR(10) FOREIGN KEY REFERENCES Users(UserID),
@@ -51,6 +51,8 @@ CREATE TABLE ProjectShares (
 );
 
 CREATE TABLE ChartShares (
+	STT INT IDENTITY(1, 1),
+    ID AS CONVERT(NVARCHAR(12), 'CS' + RIGHT('0000000' + CAST(STT AS VARCHAR(5)), 5)) PERSISTED PRIMARY KEY,
     ChartID NVARCHAR(10) FOREIGN KEY REFERENCES Charts(ChartID),
     SharedByUserID NVARCHAR(10) FOREIGN KEY REFERENCES Users(UserID),
     SharedWithUserID NVARCHAR(10) FOREIGN KEY REFERENCES Users(UserID),
@@ -59,9 +61,47 @@ CREATE TABLE ChartShares (
 );
 
 CREATE TABLE CheckPoints (
+	STT INT IDENTITY(1, 1),
+    ID AS CONVERT(NVARCHAR(12), 'CP' + RIGHT('0000000' + CAST(STT AS VARCHAR(5)), 5)) PERSISTED PRIMARY KEY,
 	ProjectID NVARCHAR(10) FOREIGN KEY REFERENCES Projects(ProjectID),
 	ChartID NVARCHAR(10) FOREIGN KEY REFERENCES Charts(ChartID),
     UserID NVARCHAR(10) FOREIGN KEY REFERENCES Users(UserID),
 	Description NVARCHAR(MAX),
 	CheckpointDate DATETIME
 );
+
+-- Tạo role cho đăng nhập
+---role----
+--Phân quyền trong sql server 
+CREATE ROLE [Admin]
+GRANT CONTROL TO [Admin]
+
+CREATE ROLE [Community]
+GRANT SELECT, INSERT, UPDATE, DELETE ON dbo.Charts TO [Community]
+GRANT SELECT, INSERT, UPDATE, DELETE ON dbo.ChartShares TO [Community]
+GRANT SELECT, INSERT, UPDATE, DELETE ON dbo.CheckPoints TO [Community]
+GRANT SELECT, INSERT, UPDATE, DELETE ON dbo.Projects TO [Community]
+GRANT SELECT ON SCHEMA::dbo TO [Community]
+
+CREATE ROLE [Master]
+GRANT SELECT, INSERT, UPDATE, DELETE ON dbo.Charts TO [Master]
+GRANT SELECT, INSERT, UPDATE, DELETE ON dbo.ChartShares TO [Master]
+GRANT SELECT, INSERT, UPDATE, DELETE ON dbo.CheckPoints TO [Master]
+GRANT SELECT, INSERT, UPDATE, DELETE ON dbo.Projects TO [Master]
+GRANT SELECT, INSERT, UPDATE, DELETE ON dbo.ProjectShares TO [Master]
+GRANT SELECT ON SCHEMA::dbo TO [Master]
+
+USE master;
+CREATE LOGIN user1 WITH PASSWORD = 'password1';
+CREATE LOGIN user2 WITH PASSWORD = 'password2';
+CREATE LOGIN user3 WITH PASSWORD = 'password3';
+
+USE MChart;
+CREATE USER user1 FOR LOGIN user1;
+ALTER ROLE [Admin] ADD MEMBER user1;
+CREATE USER user2 FOR LOGIN user2;
+ALTER ROLE [Community] ADD MEMBER user2;
+CREATE USER user3 FOR LOGIN user3;
+ALTER ROLE [Master] ADD MEMBER user3;
+
+EXEC sp_helplogins 'user1';
