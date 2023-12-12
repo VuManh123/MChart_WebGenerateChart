@@ -168,7 +168,8 @@ app.listen(5000, () => {
 // Truy vấn project, chart
 app.get('/projects', (req, res) => {
   // Thực hiện truy vấn SQL để lấy thông tin về các loại xe
-  const query = 'SELECT * FROM Projects';
+  const userName = req.session.userName;
+  const query = `SELECT * FROM Projects WHERE UserID = (SELECT UserID FROM Users WHERE UserName = '${userName}')`;
   sql.query(query)
     .then((result) => {
       // Gửi kết quả về cho máy khách
@@ -185,4 +186,32 @@ app.get('/otherRoute', function(req, res) {
   console.log(req.session); // In ra session để kiểm tra
   // Thực hiện các thao tác khác với userName
   res.json({ success: true, message: "Other route", userName: userName });
+});
+
+app.post('/addProjects', (req, res) => {
+  // Lấy thông tin xe từ yêu cầu POST
+  const userName = req.session.userName;
+  const projectName = req.body.projectName;
+  const projectDescription = req.body.projectDescription;
+  // Thực hiện truy vấn SQL để thêm thông tin xe vào cơ sở dữ liệu
+  const query = `
+      INSERT INTO Projects (ProjectName, Description, UserID)
+      VALUES (N'${projectName}','${projectDescription}', (SELECT UserID FROM Users WHERE UserName = '${userName}'))
+  `;
+
+  sql.query(query, {
+      projectName: projectName,
+      projectDescription: projectDescription,
+      userName: userName
+  })
+      .then(() => {
+          // Trả về kết quả thành công dưới dạng JSON
+          res.json({ success: true, message: 'Add project successfully' });
+      })
+      .catch(error => {
+          console.log('Error adding projects:', error);
+          // Trả về kết quả lỗi dưới dạng JSON
+          res.status(500).json({ success: false, message: 'Have an error' });
+      });
+
 });

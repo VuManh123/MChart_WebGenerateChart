@@ -182,5 +182,86 @@
         item.addEventListener('mouseover', activeLink));
         
     </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Lấy dữ liệu projects từ API
+        fetch('http://localhost:5000/projects')
+            .then(response => response.json())
+            .then(function(projectsData) {
+                // Lấy phần danh sách project
+                var projectList = document.querySelector('.project-list');
+
+                // Tạo các phần tử HTML cho từng project
+                projectsData.forEach(function(project) {
+                    var projectItem = document.createElement('div');
+                    projectItem.classList.add('project-item');
+
+                    // Tạo nội dung HTML cho project
+                    var projectHTML = `
+                        <div class="project-info">
+                            <div class="iconFolder">
+                                <ion-icon name="folder-open-outline"></ion-icon>
+                            </div>
+                            <div class="project-name">${project.ProjectName}</div>
+                            <div class="more-info">
+                                <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+                            </div>
+                        </div>
+                    `;
+
+                    projectItem.innerHTML = projectHTML;
+
+                    // Thêm project vào danh sách
+                    projectList.appendChild(projectItem);
+                });
+            })
+            .catch(function(error) {
+                console.error('Error fetching projects:', error);
+            });
+    });
+</script>
+
+<script>
+    function saveProject() {
+    var projectName = document.getElementById("projectName").value;
+    var projectDescription = document.getElementById("projectDescription").value;
+
+    // Tạo một đối tượng chứa dữ liệu dự án
+    var projectData = {
+        projectName: projectName,
+        projectDescription: projectDescription
+    };
+
+    // Gửi request POST đến server
+    fetch('http://localhost:5000/addProjects', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(projectData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Add project successfully!')
+            // Nếu thêm dự án thành công, có thể thực hiện các bước khác (ví dụ: đóng popup)
+            closePopup();
+            
+            // Gọi hàm để load lại danh sách dự án hoặc cập nhật UI
+            // reloadProjectList();
+        } else {
+            // Nếu có lỗi, có thể xử lý hoặc thông báo cho người dùng
+            console.error('Error adding project:', data.message);
+            alert('An error occurred while adding the project. Please try again.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred. Please try again.');
+    });
+}
+</script>
+
 </body>
 </html>
