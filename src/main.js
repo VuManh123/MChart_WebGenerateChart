@@ -165,14 +165,12 @@ app.listen(5000, () => {
   console.log('Server is running on port 5000');
 });
 
-// Truy vấn project, chart
+// 1. List charts
 app.get('/projects', (req, res) => {
-  // Thực hiện truy vấn SQL để lấy thông tin về các loại xe
   const userName = req.session.userName;
   const query = `SELECT * FROM Projects WHERE UserID = (SELECT UserID FROM Users WHERE UserName = '${userName}')`;
   sql.query(query)
     .then((result) => {
-      // Gửi kết quả về cho máy khách
       res.json(result.recordset);
     })
     .catch((error) => {
@@ -180,20 +178,12 @@ app.get('/projects', (req, res) => {
       res.status(500).send('Internal Server Error');
     });
 });
-// Test session
-app.get('/otherRoute', function(req, res) {
-  const userName = req.session.userName;
-  console.log(req.session); // In ra session để kiểm tra
-  // Thực hiện các thao tác khác với userName
-  res.json({ success: true, message: "Other route", userName: userName });
-});
 
+// 2. Add projects to db
 app.post('/addProjects', (req, res) => {
-  // Lấy thông tin xe từ yêu cầu POST
   const userName = req.session.userName;
   const projectName = req.body.projectName;
   const projectDescription = req.body.projectDescription;
-  // Thực hiện truy vấn SQL để thêm thông tin xe vào cơ sở dữ liệu
   const query = `
       INSERT INTO Projects (ProjectName, Description, UserID)
       VALUES (N'${projectName}','${projectDescription}', (SELECT UserID FROM Users WHERE UserName = '${userName}'))
@@ -205,13 +195,64 @@ app.post('/addProjects', (req, res) => {
       userName: userName
   })
       .then(() => {
-          // Trả về kết quả thành công dưới dạng JSON
           res.json({ success: true, message: 'Add project successfully' });
       })
       .catch(error => {
           console.log('Error adding projects:', error);
-          // Trả về kết quả lỗi dưới dạng JSON
           res.status(500).json({ success: false, message: 'Have an error' });
       });
+});
 
+// 3. Add chart not belongs to any projects
+app.post('/addChartNotBelongProject', (req, res) => {
+  const userName = req.session.userName;
+  const chartName = req.body.chartData.datasets[0].label;;  // Lấy tên biểu đồ từ dữ liệu gửi đi
+  const data = JSON.stringify(req.body.chartData);  // Lấy toàn bộ dữ liệu biểu đồ dưới dạng JSON
+
+  const query = `
+      INSERT INTO Charts (ChartName, Data, UserID)
+      VALUES (N'${chartName}', '${data}', (SELECT UserID FROM Users WHERE UserName = '${userName}'))
+  `;
+
+  sql.query(query, {
+      chartName: chartName,
+      data: data,
+      userName: userName
+  })
+      .then(() => {
+          res.json({ success: true, message: 'Add chart successfully' });
+      })
+      .catch(error => {
+          console.log('Error adding chart:', error);
+          res.status(500).json({ success: false, message: 'Have an error' });
+      });
+});
+
+// 4. List chart not belong to any projects
+app.get('/chartNotBelongProject', (req, res) => {
+  const userName = req.session.userName;
+  const query = `SELECT * FROM Charts WHERE UserID = (SELECT UserID FROM Users WHERE UserName = '${userName}') AND ProjectID IS NULL`;
+  sql.query(query)
+    .then((result) => {
+      res.json(result.recordset);
+    })
+    .catch((error) => {
+      console.log('Error executing SQL query:', error);
+      res.status(500).send('Internal Server Error');
+    });
+});
+
+// 5. List chart belong to project
+app.get('/chartBelongProject/:projectID', (req, res) => {
+  const userName = req.session.userName;
+  const projectID = req.params.projectID;
+  const query = `SELECT * FROM Charts WHERE UserID = (SELECT UserID FROM Users WHERE UserName = '${userName}') AND ProjectID ='${projectID}'`;
+  sql.query(query)
+    .then((result) => {
+      res.json(result.recordset);
+    })
+    .catch((error) => {
+      console.log('Error executing SQL query:', error);
+      res.status(500).send('Internal Server Error');
+    });
 });

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MChart</title>
+    <link rel="stylesheet" type="text/css" href="../styles/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="navigation">
+            <ul>
+                <li>
+                    <a href="./index.html">
+                        <span class="icon"><ion-icon name="bar-chart-outline"></ion-icon></span>
+                        <span class="title">MChart</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="./index.html">
+                        <span class="icon"><ion-icon name="home-outline"></ion-icon></span>
+                        <span class="title">Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="./myProject.html">
+                        <span class="icon"><ion-icon name="folder-outline"></ion-icon></span>
+                        <span class="title">My Projects</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="./shareWithMe.html">
+                        <span class="icon"><ion-icon name="share-social-outline"></ion-icon></span>
+                        <span class="title">Shared With Me</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="./recently.html">
+                        <span class="icon"><ion-icon name="time-outline"></ion-icon></span>
+                        <span class="title">Recently</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="./recycleBin.html">
+                        <span class="icon"><ion-icon name="trash-bin-outline"></ion-icon></span>
+                        <span class="title">Recycle Bin</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="./help.html">
+                        <span class="icon"><ion-icon name="help-circle-outline"></ion-icon></span>
+                        <span class="title">Help</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="./settings.html">
+                        <span class="icon"><ion-icon name="settings-outline"></ion-icon></span>
+                        <span class="title">Settings</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="confirmSignOut">
+                        <span class="icon"><ion-icon name="log-out-outline"></ion-icon></span>
+                        <span class="title">Sign Out</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- main -->
+        <div class="main">
+            <div class="topbar">
+                <div class="toggle">
+                    <ion-icon name="menu-outline"></ion-icon>
+                </div>
+                <div class="search">
+                    <label>
+                        <input type="text" placeholder="Enter infomation that you want ...">
+                        <ion-icon name="search-outline"></ion-icon>
+                    </label>
+                </div>
+
+                <!-- logo image -->
+                <div class="logo">
+                    <img src="../images/Logo.png">
+                </div>
+            </div>
+            
+            <div class="popup-container">
+                <button class="addProject">
+                  <div class="iconAdd">
+                    <ion-icon name="add-outline"></ion-icon>
+                  </div>
+                  <div class="addButton">
+                    <div>Add Chart</div>
+                  </div>
+                </button>
+            </div>
+
+            <div class="ListChart">
+                <h4>----- My charts -----</h4>
+                <!-- Danh sách chart -->
+                <div class="chart-list">
+                    <!-- Các project được thêm vào đây bằng JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../../models/chart.js"></script>
+    <script>
+        function confirmSignOut() {
+            var isConfirmed = confirm("Are you sure you want to sign out?");
+            if (isConfirmed) {
+                // Thực hiện các bước đăng xuất ở đây (ví dụ: chuyển hướng đến trang đăng nhập)
+                window.location.href = "login.html";
+            }
+        }
+    </script>
+
+    <script>
+        // Day thanh taskbar vao
+        let toggle = document.querySelector('.toggle');
+        let navigation = document.querySelector('.navigation');
+        let main = document.querySelector('.main');
+
+        toggle.onclick = function(){
+            navigation.classList.toggle('active')
+            main.classList.toggle('active')
+        }
+        // Co dinh hover cho thanh taskbar
+        let list = document.querySelectorAll('.navigation li');
+        function activeLink(){
+            list.forEach((item) =>
+            item.classList.remove('hovered'));
+            this.classList.add('hovered');
+        }
+        list.forEach((item) =>
+        item.addEventListener('mouseover', activeLink));
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Lấy projectID từ URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const projectId = urlParams.get('projectId');
+    
+            // Kiểm tra xem projectID có tồn tại không
+            if (projectId) {
+                // Gọi API để lấy danh sách chart thuộc dự án có projectID
+                fetch(`http://localhost:5000/chartBelongProject/${projectId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Duyệt qua từng chart và tạo biểu đồ
+                        data.forEach(chart => {
+                        // Tạo container cho biểu đồ
+                        var chartContainer = document.createElement('div');
+                        chartContainer.className = 'chart-container';
+                    
+                        // Tạo tiêu đề cho biểu đồ
+                        var chartTitle = document.createElement('li');
+                        chartTitle.textContent = chart.ChartName;
+                        chartContainer.appendChild(chartTitle);
+
+                        // Tạo biểu tượng ion-icon
+                        var ellipsisIcon = document.createElement('ion-icon');
+                        ellipsisIcon.setAttribute('name', 'ellipsis-vertical-outline');
+                        ellipsisIcon.style.float = 'right'; // Đặt nó sang phải
+                        chartTitle.appendChild(ellipsisIcon);
+                    
+                        // Tạo canvas cho biểu đồ
+                        var canvas = document.createElement('canvas');
+                        canvas.id = chart.ChartID;
+                        chartContainer.appendChild(canvas);
+                    
+                        // Thêm container vào danh sách
+                        document.querySelector('.chart-list').appendChild(chartContainer);
+                    
+                        // Pars data từ chuỗi JSON trong trường 'Data'
+                        var chartData = JSON.parse(chart.Data);
+                        
+                        // Kiểm tra xem có trường 'chartType' không
+                        var chartType = chartData.datasets[0].chartType || 'bar';
+                    
+                        // Thêm biểu đồ bằng Chart.js với loại biểu đồ tương ứng
+                        var ctx = document.getElementById(chart.ChartID).getContext('2d');
+                        new Chart(ctx, {
+                            type: chartType,
+                            data: chartData,
+                        });
+                        });
+                    });
+            } else {
+                console.error('No projectId found in the URL');
+            }
+        });
+    </script>
+</body>
+</html>

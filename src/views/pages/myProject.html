@@ -113,13 +113,19 @@
             </div>
 
             <!-- Danh sách project -->
-            <div class="project-list">
-                <!-- Các project được thêm vào đây bằng JavaScript -->
+            <div class="ListProject">
+                <h4>----- My projects -----</h4>
+                <div class="project-list">
+                    <!-- Các project được thêm vào đây bằng JavaScript -->
+                </div>
             </div>
 
-            <!-- Danh sách chart -->
-            <div class="chart-list">
-                <!-- Các project được thêm vào đây bằng JavaScript -->
+            <div class="ListChart">
+                <h4>----- My charts -----</h4>
+                <!-- Danh sách chart -->
+                <div class="chart-list">
+                    <!-- Các project được thêm vào đây bằng JavaScript -->
+                </div>
             </div>
         </div>
 
@@ -130,6 +136,7 @@
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../../models/chart.js"></script>
+    <script src="../../models/function.js"></script>
 
     <script>
         function confirmSignOut() {
@@ -199,15 +206,26 @@
 
                     // Tạo nội dung HTML cho project
                     var projectHTML = `
-                        <div class="project-info">
-                            <div class="iconFolder">
-                                <ion-icon name="folder-open-outline"></ion-icon>
+                    <a href="./project-detail.html?projectId=${project.ProjectID}" class="project-link">
+                            <div class="project-info">
+                                <div class="iconFolder">
+                                    <ion-icon name="folder-open-outline"></ion-icon>
+                                </div>
+                                <div class="project-name">${project.ProjectName}</div>
+                                <div class="more-info">
+                                    <!-- Use onclick to call the showOptions function -->
+                                    <ion-icon name="ellipsis-vertical-outline" onclick="showOptions(event, '${project.ProjectID}')"></ion-icon>
+                                </div>
                             </div>
-                            <div class="project-name">${project.ProjectName}</div>
-                            <div class="more-info">
-                                <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+                        </a>
+                        <div class="popupProject" id="popupProject-${project.ProjectID}">
+                            <div class="popupProject-content">
+                                <a href="#" onclick="renameProject('${project.ProjectID}')">Rename</a>
+                                <a href="#" onclick="shareProject('${project.ProjectID}')">Share Project</a>
+                                <a href="#" onclick="removeProject('${project.ProjectID}')">Remove</a>
+                                <a href="#" onclick="viewFileInfo('${project.ProjectID}')">View File Info</a>
                             </div>
-                        </div>
+                        </div>              
                     `;
 
                     projectItem.innerHTML = projectHTML;
@@ -245,13 +263,8 @@
     .then(data => {
         if (data.success) {
             alert('Add project successfully!')
-            // Nếu thêm dự án thành công, có thể thực hiện các bước khác (ví dụ: đóng popup)
             closePopup();
-            
-            // Gọi hàm để load lại danh sách dự án hoặc cập nhật UI
-            // reloadProjectList();
         } else {
-            // Nếu có lỗi, có thể xử lý hoặc thông báo cho người dùng
             console.error('Error adding project:', data.message);
             alert('An error occurred while adding the project. Please try again.');
         }
@@ -263,5 +276,51 @@
 }
 </script>
 
+<script>
+    // Lấy dữ liệu từ API
+    fetch('http://localhost:5000/chartNotBelongProject')
+      .then(response => response.json())
+      .then(data => {
+        // Duyệt qua từng chart và tạo biểu đồ
+        data.forEach(chart => {
+          // Tạo container cho biểu đồ
+          var chartContainer = document.createElement('div');
+          chartContainer.className = 'chart-container';
+    
+          // Tạo tiêu đề cho biểu đồ
+          var chartTitle = document.createElement('li');
+          chartTitle.textContent = chart.ChartName;
+          chartContainer.appendChild(chartTitle);
+
+          // Tạo biểu tượng ion-icon
+        var ellipsisIcon = document.createElement('ion-icon');
+        ellipsisIcon.setAttribute('name', 'ellipsis-vertical-outline');
+        ellipsisIcon.style.float = 'right'; // Đặt nó sang phải
+        chartTitle.appendChild(ellipsisIcon);
+    
+          // Tạo canvas cho biểu đồ
+          var canvas = document.createElement('canvas');
+          canvas.id = chart.ChartID;
+          chartContainer.appendChild(canvas);
+    
+          // Thêm container vào danh sách
+          document.querySelector('.chart-list').appendChild(chartContainer);
+    
+          // Pars data từ chuỗi JSON trong trường 'Data'
+          var chartData = JSON.parse(chart.Data);
+          
+          // Kiểm tra xem có trường 'chartType' không
+          var chartType = chartData.datasets[0].chartType || 'bar';
+    
+          // Thêm biểu đồ bằng Chart.js với loại biểu đồ tương ứng
+          var ctx = document.getElementById(chart.ChartID).getContext('2d');
+          new Chart(ctx, {
+            type: chartType,
+            data: chartData,
+          });
+        });
+      });
+    </script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
 </html>

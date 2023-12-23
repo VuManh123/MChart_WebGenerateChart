@@ -487,7 +487,7 @@ body
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding: 15px;
-    z-index: 1;
+    z-index: 4;
 }
 .popup-content label {
     font-weight: bold;
@@ -533,7 +533,7 @@ body
   .iconFolder {
     margin-right: 10px;
     color: #6f268f;
-    z-index: 1;
+    z-index: 3;
   }
 
   .project-name {
@@ -550,3 +550,75 @@ body
     display: flex;
     flex-wrap: wrap;
   }
+
+.ListProject h4,
+.ListChart h4 {
+    border-bottom: 1px solid #ccc;  
+    margin-left: 20px;
+    margin-right: 20px;
+    padding-bottom: 5px;           /* Khoảng cách dưới */
+    margin-bottom: 8px;           /* Khoảng cách phía dưới */
+    margin-top: 20px;
+    font-weight: normal;           /* Bỏ in đậm */            /* Kích thước chữ */
+    color: var(--tim2);                   /* Màu chữ */
+}
+
+.chart-container {
+    width: 390px;
+    height: 430px;
+    display: inline-block; /* Hiển thị theo hàng ngang */
+    flex-wrap: wrap;
+    margin: 20px 20px 20px 20px;
+    box-sizing: border-box;
+    border: 1px solid #6f268f;
+    padding: 10px;
+    list-style: none; /* Ẩn dấu đầu dòng của thẻ li */
+    border-radius: 8px; /* Bo tròn góc của container */
+    background-color: #f8f3f7; /* Màu nền của container */
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); /* Đổ bóng cho container */
+  }
+
+  canvas {
+    width: 100% !important;
+    height: auto !important;
+  }
+
+  .chart-container li {
+    margin-bottom: 10px;
+    font-size: 16px; /* Kích thước chữ của tiêu đề */
+    font-weight: bold; /* Đậm chữ */
+    color: #6f268f; /* Màu chữ */
+  }
+  .chart-container ion-icon {
+    cursor: pointer;
+    color: #6f268f;
+  }
+
+  .project-link {
+    text-decoration: none;
+  }
+  .popupProject {
+    display: none;
+    position: absolute;
+    margin-left: 90px;
+    background-color: #f9f9f9;
+    border: 1px solid var(--tim2);
+    border-radius: 8px;
+    padding: 10px;
+    z-index: 1;
+}
+
+.popupProject-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.popupProject-content a {
+    padding: 5px;
+    text-decoration: none;
+    color: #333;
+}
+.popupProject-content a:hover {
+    background: var(--white1);
+    border-radius: 8px;
+}

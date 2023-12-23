@@ -24,6 +24,7 @@ CREATE TABLE Projects (
 	UserID NVARCHAR(10) FOREIGN KEY REFERENCES Users(UserID),
 	CreateAt DATETIME DEFAULT GETDATE()
 );
+DELETE FROM Charts WHERE ChartID = 'MC00001'
 
 -- Thêm một dự án mới
 INSERT INTO Projects (ProjectName, Description, UserID)
@@ -36,9 +37,11 @@ CREATE TABLE Charts (
 	ChartName NVARCHAR(255),
     Data NVARCHAR(MAX), -- Dữ liệu lưu trữ dưới dạng JSON
 	CreateAt DATETIME DEFAULT GETDATE(),
-	ProjectID NVARCHAR(10) FOREIGN KEY REFERENCES Projects(ProjectID),
+	ProjectID NVARCHAR(10) FOREIGN KEY REFERENCES Projects(ProjectID), 
 );
-
+ALTER TABLE Charts
+ADD UserID NVARCHAR(10) FOREIGN KEY REFERENCES Users(UserID);
+ 
 -- 4. Tao bang share project
 CREATE TABLE ProjectShares (
 	STT INT IDENTITY(1, 1),
@@ -71,8 +74,7 @@ CREATE TABLE CheckPoints (
 );
 
 -- Tạo role cho đăng nhập
----role----
---Phân quyền trong sql server 
+-- Phân quyền trong sql server 
 CREATE ROLE [Admin]
 GRANT CONTROL TO [Admin]
 
