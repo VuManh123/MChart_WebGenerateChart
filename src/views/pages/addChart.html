@@ -125,6 +125,11 @@
                 <div>
                     <button class="button-save" type="button" onclick="saveChart()">Save Chart</button>
                 </div>
+                <div>
+                    <button class="button-upload" type="button" onclick="handleFileUpload()">Upload File</button>
+                    <!-- Add an input element for file upload -->
+                    <input type="file" id="file-input" accept=".txt, .json" style="display: none" onchange="handleFileChange(event)">
+                </div>
             </form>
             
 
@@ -139,6 +144,7 @@
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../../models/chart.js"></script>
+    <script src="../../models/function.js"></script>
     <script>
         function confirmSignOut() {
             var isConfirmed = confirm("Are you sure you want to sign out?");

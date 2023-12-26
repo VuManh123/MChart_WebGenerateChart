@@ -477,6 +477,23 @@ body
     background-color: #fff; /* Màu nền khi di chuột qua */
     color: #6f268f; /* Màu chữ khi di chuột qua */
 }
+.button-upload {
+    position: relative;
+    padding: 10px;
+    margin-left: 20px;
+    border: 2px solid #6f268f; /* Đổi thành border có màu tương ứng */
+    display: flex;
+    border-radius: 5px; /* Bo tròn góc nút */
+    transition: background-color 0.3s ease, color 0.3s ease;
+    cursor: pointer;
+    background-color: #6f268f;
+    color: #fff; /* Màu chữ ban đầu */
+}
+
+.button-upload:hover {
+    background-color: #fff; /* Màu nền khi di chuột qua */
+    color: #6f268f; /* Màu chữ khi di chuột qua */
+}
 
 .popup-content {
     margin: 0px 0 0 188px;
@@ -621,4 +638,49 @@ body
 .popupProject-content a:hover {
     background: var(--white1);
     border-radius: 8px;
+}
+
+.modal-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: #f8f3f7;
+    padding: 20px;
+    border: 2px solid var(--tim2);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+h2 {
+    color: var(--tim2);
+    margin-bottom: 10px;
+}
+.button-container {
+    display: flex;
+    margin-left: 5px;
+    margin-top: 15px;
+}
+
+.label-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+label {
+    margin-right: 10px;
+}
+
+select, input {
+    flex: 1;
+    padding: 8px;
+    margin: 0;
 }

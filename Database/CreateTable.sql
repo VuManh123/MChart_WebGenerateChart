@@ -70,7 +70,7 @@ CREATE TABLE CheckPoints (
 	ChartID NVARCHAR(10) FOREIGN KEY REFERENCES Charts(ChartID),
     UserID NVARCHAR(10) FOREIGN KEY REFERENCES Users(UserID),
 	Description NVARCHAR(MAX),
-	CheckpointDate DATETIME
+	CheckpointDate DATETIME DEFAULT GETDATE()
 );
 
 -- Tạo role cho đăng nhập
@@ -107,3 +107,48 @@ CREATE USER user3 FOR LOGIN user3;
 ALTER ROLE [Master] ADD MEMBER user3;
 
 EXEC sp_helplogins 'user1';
+
+-- 1. Tạo bảng Deleted cho Projects
+CREATE TABLE DeletedProjects (
+    STT INT,
+    ProjectID NVARCHAR(10) PRIMARY KEY,
+    ProjectName NVARCHAR(255),
+    Description NVARCHAR(MAX),
+    UserID NVARCHAR(10),
+    CreateAt DATETIME
+);
+
+-- Trigger cho việc chuyển dữ liệu đã xóa từ Projects vào DeletedProjects
+CREATE TRIGGER trg_DeleteProjects
+ON Projects
+AFTER DELETE
+AS
+BEGIN
+    INSERT INTO DeletedProjects (STT, ProjectID, ProjectName, Description, UserID, CreateAt)
+    SELECT STT, ProjectID, ProjectName, Description, UserID, CreateAt
+    FROM DELETED;
+END;
+
+-- 2. Tạo bảng Deleted cho Charts
+CREATE TABLE DeletedCharts (
+    STT INT,
+    ChartID NVARCHAR(10) PRIMARY KEY,
+    ChartName NVARCHAR(255),
+    Data NVARCHAR(MAX),
+    CreateAt DATETIME,
+    ProjectID NVARCHAR(10)
+);
+
+ALTER TABLE DeletedCharts
+ADD UserID NVARCHAR(10);
+
+
+CREATE TRIGGER trg_DeleteCharts
+ON Charts
+AFTER DELETE
+AS
+BEGIN
+    INSERT INTO DeletedCharts (STT, ChartID, ChartName, Data, CreateAt, ProjectID, UserID)
+    SELECT STT, ChartID, ChartName, Data, CreateAt, ProjectID, UserID
+    FROM DELETED;
+END;

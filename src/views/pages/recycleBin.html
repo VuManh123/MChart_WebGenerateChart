@@ -86,12 +86,28 @@
                 </div>
             </div>
             
+            <!-- Danh sách project -->
+            <div class="ListProject">
+                <h4>----- My projects -----</h4>
+                <div class="project-list">
+                    <!-- Các project được thêm vào đây bằng JavaScript -->
+                </div>
+            </div>
+
+            <div class="ListChart">
+                <h4>----- My charts -----</h4>
+                <!-- Danh sách chart -->
+                <div class="chart-list">
+                    <!-- Các project được thêm vào đây bằng JavaScript -->
+                </div>
+            </div>
         </div>
     </div>
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../../models/chart.js"></script>
+    <script src="../../models/function.js"></script>
 
     <script>
         function confirmSignOut() {
@@ -122,5 +138,97 @@
         list.forEach((item) =>
         item.addEventListener('mouseover', activeLink));
     </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Lấy dữ liệu projects từ API
+            fetch('http://localhost:5000/projectsDeleted')
+                .then(response => response.json())
+                .then(function(projectsData) {
+                    // Lấy phần danh sách project
+                    var projectList = document.querySelector('.project-list');
+
+                    // Tạo các phần tử HTML cho từng project
+                    projectsData.forEach(function(project) {
+                        var projectItem = document.createElement('div');
+                        projectItem.classList.add('project-item');
+                        projectItem.setAttribute('data-project-id', project.ProjectID);
+
+                        // Tạo nội dung HTML cho project
+                        var projectHTML = `
+                        <a href="./projectDeleted-detail.html?projectId=${project.ProjectID}" class="project-link">
+                                <div class="project-info">
+                                    <div class="iconFolder">
+                                        <ion-icon name="folder-open-outline"></ion-icon>
+                                    </div>
+                                    <div class="project-name">${project.ProjectName}</div>
+                                    <div class="more-info">
+                                        <ion-icon name="ellipsis-vertical-outline" onclick="showOptions(event, '${project.ProjectID}')"></ion-icon>
+                                    </div>
+                                </div>
+                            </a>
+                            <div class="popupProject" id="popupProject-${project.ProjectID}">
+                                <div class="popupProject-content">
+                                    <a href="#" onclick="restoreProject('${project.ProjectID}')">Restore</a>
+                                </div>
+                            </div>              
+                        `;
+
+                        projectItem.innerHTML = projectHTML;
+
+                        // Thêm project vào danh sách
+                        projectList.appendChild(projectItem);
+                    });
+                })
+                .catch(function(error) {
+                    console.error('Error fetching projects:', error);
+                });
+        });
+    </script>
+    <script>
+        document.addEventListener('click', function(event) {
+        closeAllPopups();
+    });
+    </script>
+    <!-- Chart not belong to any project -->
+    <script>
+        fetch('http://localhost:5000/chartDeletedNotBelongProject')
+          .then(response => response.json())
+          .then(data => {
+            data.forEach(chart => {
+              var chartContainer = document.createElement('div');
+              chartContainer.className = 'chart-container';
+        
+              // Tạo tiêu đề cho biểu đồ
+              var chartTitle = document.createElement('li');
+              chartTitle.textContent = chart.ChartName;
+              chartContainer.appendChild(chartTitle);
+    
+              // Tạo biểu tượng ion-icon
+            var ellipsisIcon = document.createElement('ion-icon');
+            ellipsisIcon.setAttribute('name', 'ellipsis-vertical-outline');
+            ellipsisIcon.style.float = 'right';
+            chartTitle.appendChild(ellipsisIcon);
+        
+              // Tạo canvas cho biểu đồ
+              var canvas = document.createElement('canvas');
+              canvas.id = chart.ChartID;
+              chartContainer.appendChild(canvas);
+        
+              // Thêm container vào danh sách
+              document.querySelector('.chart-list').appendChild(chartContainer);
+        
+              var chartData = JSON.parse(chart.Data);
+              
+              var chartType = chartData.datasets[0].chartType || 'bar';
+        
+              var ctx = document.getElementById(chart.ChartID).getContext('2d');
+              new Chart(ctx, {
+                type: chartType,
+                data: chartData,
+              });
+            });
+          });
+        </script>
 </body>
 </html>

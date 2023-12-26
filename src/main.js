@@ -165,7 +165,7 @@ app.listen(5000, () => {
   console.log('Server is running on port 5000');
 });
 
-// 1. List charts
+// 1. List projects
 app.get('/projects', (req, res) => {
   const userName = req.session.userName;
   const query = `SELECT * FROM Projects WHERE UserID = (SELECT UserID FROM Users WHERE UserName = '${userName}')`;
@@ -247,6 +247,125 @@ app.get('/chartBelongProject/:projectID', (req, res) => {
   const userName = req.session.userName;
   const projectID = req.params.projectID;
   const query = `SELECT * FROM Charts WHERE UserID = (SELECT UserID FROM Users WHERE UserName = '${userName}') AND ProjectID ='${projectID}'`;
+  sql.query(query)
+    .then((result) => {
+      res.json(result.recordset);
+    })
+    .catch((error) => {
+      console.log('Error executing SQL query:', error);
+      res.status(500).send('Internal Server Error');
+    });
+});
+
+// 6. Rename project
+app.post('/updateNameProject', (req, res) => {
+  const projectID = req.body.projectID;
+  const projectNewName = req.body.projectNewName;
+  
+  const query = `UPDATE Projects SET ProjectName = N'${projectNewName}' WHERE ProjectID ='${projectID}'`;
+  sql.query(query)
+      .then(() => {
+        res.json({ success: true, message: 'Update project name successfully!' });
+      })
+      .catch(error => {
+        console.log('Error updating project:', error);
+        res.status(500).json({ success: false, message: 'Có lỗi xảy ra khi sửa project' });
+      });
+  });
+
+// 7. Remove project
+app.post('/removeProject', (req, res) => {
+  const projectID = req.body.projectID;
+
+  const query = `DELETE FROM Charts WHERE ProjectID ='${projectID}';
+                DELETE FROM Projects WHERE ProjectID ='${projectID}'`;
+  sql.query(query)
+    .then(() => {
+      res.json({ success: true, message: 'Delete project successfully!' });
+    })
+    .catch(error => {
+      console.log('Error removing project:', error);
+      res.status(500).json({ success: false, message: 'Có lỗi xảy ra khi xóa nhân viên' });
+    });
+});
+
+
+// 8. Share project
+app.post('/shareProject', (req, res) => {
+  const role = req.body.role;
+  const emailUser = req.body.emailUser;
+  const projectID = req.body.projectID;
+  const userName = req.session.userName;
+  const query = `INSERT INTO ProjectShares (ProjectID, SharedByUserID, SharedWithUserID, AccessLevel) VALUES (N'${projectID}', (SELECT UserID FROM Users WHERE UserName = '${userName}'), (SELECT UserID FROM Users WHERE Email = '${emailUser}'), N'${role}')`;
+  sql.query(query)
+    .then(() => {
+      res.json({ success: true, message: 'Share project successfully!' });
+    })
+    .catch(error => {
+      console.log('Error sharing projects:', error);
+      res.status(500).json({ success: false, message: 'Có lỗi xảy ra khi share project' });
+    });
+});
+
+// 9. View info project
+app.post('/listInfoProject', (req, res) => {
+  const projectID = req.body.projectID;
+  console.log('Received projectID:', projectID);
+  const query = `SELECT p.ProjectName, p.Description, p.CreateAt, c.Description AS CheckpointDescription, c.CheckpointDate FROM Projects p LEFT JOIN CheckPoints c ON p.ProjectID = c.ProjectID WHERE p.ProjectID = '${projectID}'`;
+  sql.query(query)
+    .then((result) => {
+      res.json(result.recordset);
+    })
+    .catch((error) => {
+      console.log('Error executing SQL query:', error);
+      res.status(500).send('Internal Server Error');
+    });
+});
+
+// 10. View projectDeleted
+app.get('/projectsDeleted', (req, res) => {
+  const userName = req.session.userName;
+  const query = `SELECT * FROM DeletedProjects WHERE UserID = (SELECT UserID FROM Users WHERE UserName = '${userName}')`;
+  sql.query(query)
+    .then((result) => {
+      res.json(result.recordset);
+    })
+    .catch((error) => {
+      console.log('Error executing SQL query:', error);
+      res.status(500).send('Internal Server Error');
+    });
+});
+// 11. View chartDeleted not belongs to project
+app.get('/chartDeletedNotBelongProject', (req, res) => {
+  const userName = req.session.userName;
+  const query = `SELECT * FROM DeletedCharts WHERE UserID = (SELECT UserID FROM Users WHERE UserName = '${userName}') AND ProjectID IS NULL`;
+  sql.query(query)
+    .then((result) => {
+      res.json(result.recordset);
+    })
+    .catch((error) => {
+      console.log('Error executing SQL query:', error);
+      res.status(500).send('Internal Server Error');
+    });
+});
+// 12. View chartDeleted belongs to project
+app.get('/chartDeletedBelongProject/:projectID', (req, res) => {
+  const userName = req.session.userName;
+  const projectID = req.params.projectID;
+  const query = `SELECT * FROM DeletedCharts WHERE UserID = (SELECT UserID FROM Users WHERE UserName = '${userName}') AND ProjectID ='${projectID}'`;
+  sql.query(query)
+    .then((result) => {
+      res.json(result.recordset);
+    })
+    .catch((error) => {
+      console.log('Error executing SQL query:', error);
+      res.status(500).send('Internal Server Error');
+    });
+});
+// 13. View projectShared
+app.get('/projectsShared', (req, res) => {
+  const userName = req.session.userName;
+  const query = `SELECT * FROM ProjectShares ps JOIN Projects p ON ps.ProjectID = p.ProjectID WHERE ps.SharedWithUserID = (SELECT UserID FROM Users WHERE UserName = '${userName}')`;
   sql.query(query)
     .then((result) => {
       res.json(result.recordset);
