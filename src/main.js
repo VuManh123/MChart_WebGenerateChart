@@ -76,9 +76,10 @@ app.post('/logout', function(req, res) {
 app.post('/login', function(req, res) {
   const username = req.body.username;
   const password = req.body.password;
+  console.log('Handling login request...');
 
   // Tạo truy vấn SQL để kiểm tra thông tin đăng nhập
-  const query = `SELECT * FROM Users WHERE UserName LIKE '%${username}%' AND Password LIKE '%${password}%'`;
+  const query = `SELECT * FROM Users WHERE UserName = '${username}' AND Password = '${password}'`;
 
   // Thực hiện truy vấn SQL
   const request = new sql.Request();
@@ -134,6 +135,22 @@ app.post('/login', function(req, res) {
   });
 });
 
+// Middleware xác thực
+const authenticateUser = (req, res, next) => {
+  const exemptedRoutes = ['/login.html', '/public-route1', '/public-route2'];
+
+  if (exemptedRoutes.includes(req.path)) {
+    next();
+  } else {
+    if (!req.session.userName) {
+      // Nếu người dùng chưa đăng nhập, chuyển hướng về trang đăng nhập
+      res.redirect('/login.html');
+    } else {
+      next();
+    }
+  }
+};
+
 // Reset lai cac ket noi khi dang xuat
 module.exports = connect ;
 // Định vị thư mục chứa các tệp tĩnh
@@ -142,7 +159,8 @@ app.use('/models', express.static(path.join(__dirname, 'models')));
 app.use('/controller', express.static(path.join(__dirname, 'controller')));
 app.use('/images', express.static(path.join(__dirname, 'views', 'images')));
 
-// Định vị thư mục chứa các tệp HTML
+// Middleware xác thực cho tất cả các route cung cấp tệp HTML
+app.use(authenticateUser);
 app.set('pages', path.join(__dirname, 'pages'));
 
 app.engine('html', require('ejs').renderFile);
@@ -158,6 +176,12 @@ app.use((req, res, next) => {
       next();
     }
   });
+});
+
+// Route chính cho giao diện chính
+app.get('/main', (req, res) => {
+  // Code to handle the main interface
+  res.sendFile(path.join(htmlDir, 'index.html'));
 });
 
 // Khởi động máy chủ
@@ -365,7 +389,34 @@ app.get('/chartDeletedBelongProject/:projectID', (req, res) => {
 // 13. View projectShared
 app.get('/projectsShared', (req, res) => {
   const userName = req.session.userName;
-  const query = `SELECT * FROM ProjectShares ps JOIN Projects p ON ps.ProjectID = p.ProjectID WHERE ps.SharedWithUserID = (SELECT UserID FROM Users WHERE UserName = '${userName}')`;
+  const query = `SELECT p.ProjectID, p.ProjectName, p.Description, p.UserID, p.CreateAt, ps.SharedByUserID, ps.SharedWithUserID, ps.AccessLevel, ps.ShareDate FROM ProjectShares ps JOIN Projects p ON ps.ProjectID = p.ProjectID WHERE ps.SharedWithUserID = (SELECT UserID FROM Users WHERE UserName = '${userName}')`;
+  sql.query(query)
+    .then((result) => {
+      res.json(result.recordset);
+    })
+    .catch((error) => {
+      console.log('Error executing SQL query:', error);
+      res.status(500).send('Internal Server Error');
+    });
+});
+// 14. View chartShared not belongs to project
+app.get('/chartSharedNotBelongProject', (req, res) => {
+  const userName = req.session.userName;
+  const query = `SELECT * FROM ChartShares cs JOIN Charts c ON cs.ChartID = c.ChartID WHERE cs.SharedWithUserID = (SELECT UserID FROM Users WHERE UserName = '${userName}') AND ProjectID IS NULL`;
+  sql.query(query)
+    .then((result) => {
+      res.json(result.recordset);
+    })
+    .catch((error) => {
+      console.log('Error executing SQL query:', error);
+      res.status(500).send('Internal Server Error');
+    });
+});
+// 15. View chartShared belongs to project
+app.get('/chartSharedBelongProject/:projectID', (req, res) => {
+  const userName = req.session.userName;
+  const projectID = req.params.projectID;
+  const query = `SELECT c.ChartID, c.ChartName, c.Data, c.CreateAt, c.ProjectID, cs.SharedByUserID, SharedWithUserID, cs.AccessLevel, cs.ShareDate FROM ChartShares cs JOIN Charts c ON cs.ChartID = c.ChartID WHERE cs.SharedWithUserID = (SELECT UserID FROM Users WHERE UserName = '${userName}') AND ProjectID ='${projectID}'`;
   sql.query(query)
     .then((result) => {
       res.json(result.recordset);

@@ -152,3 +152,24 @@ BEGIN
     SELECT STT, ChartID, ChartName, Data, CreateAt, ProjectID, UserID
     FROM DELETED;
 END;
+
+-- Trigger cho việc tự động insert vào bảng chartshare khi có 1 projectshare
+-- Tạo trigger
+CREATE TRIGGER trgInsertChartShares
+ON ProjectShares
+AFTER INSERT
+AS
+BEGIN
+    -- Insert vào bảng ChartShares
+    INSERT INTO ChartShares (ChartID, SharedByUserID, SharedWithUserID, AccessLevel, ShareDate)
+    SELECT 
+        c.ChartID,
+        i.SharedByUserID,
+        i.SharedWithUserID,
+        i.AccessLevel,
+        GETDATE()
+    FROM 
+        inserted i
+    INNER JOIN
+        Charts c ON i.ProjectID = c.ProjectID;
+END;
