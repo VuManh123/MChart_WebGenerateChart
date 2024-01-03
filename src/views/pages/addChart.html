@@ -144,7 +144,6 @@
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="../../models/chart.js"></script>
     <script src="../../models/function.js"></script>
     <script>
         function confirmSignOut() {
@@ -176,8 +175,12 @@
         list.forEach((item) =>
         item.addEventListener('mouseover', activeLink));
 
+        var myChart;
         // Hàm cập nhật biểu đồ
         function updateChart() {
+            if (myChart) {
+                myChart.destroy();
+            } 
             var chartName = document.getElementById('chart-name').value;
             var chartType = document.getElementById('chart-type').value;
             var inputData = document.getElementById('data-input').value;
@@ -185,10 +188,8 @@
 
             var data = inputData.split(',').map(Number);
             var labels = labelInput.split(',');
-
-            // Lấy tham chiếu đến canvas và vẽ biểu đồ
             var ctx = document.getElementById('myChart').getContext('2d');
-            var myChart = new Chart(ctx, {
+            myChart = new Chart(ctx, {
                 type: chartType,
                 data: {
                     labels: labels,
@@ -246,65 +247,71 @@
 
     <script>
         function saveChart() {
-        var chartName = document.getElementById('chart-name').value;
-        var chartType = document.getElementById('chart-type').value;
-        var inputData = document.getElementById('data-input').value;
-        var labelInput = document.getElementById('label-input').value;
-
-        var data = {
-            chartData: {
-                labels: labelInput.split(','),
-                datasets: [
-                    {
-                        chartType: chartType,
-                        label: chartName,
-                        data: inputData.split(',').map(Number),
-                        backgroundColor: [
-                            'rgba(255, 99, 132, 0.2)',
-                            'rgba(255, 159, 64, 0.2)',
-                            'rgba(255, 205, 86, 0.2)',
-                            'rgba(75, 192, 192, 0.2)',
-                            'rgba(54, 162, 235, 0.2)',
-                            'rgba(153, 102, 255, 0.2)',
-                            'rgba(201, 203, 207, 0.2)'
-                        ],
-                        borderColor: [
-                            'rgb(255, 99, 132)',
-                            'rgb(255, 159, 64)',
-                            'rgb(255, 205, 86)',
-                            'rgb(75, 192, 192)',
-                            'rgb(54, 162, 235)',
-                            'rgb(153, 102, 255)',
-                            'rgb(201, 203, 207)'
-                        ],
-                        borderWidth: 2
-                    }
-                ]
-            },
-        };
-
-        // Sử dụng XMLHttpRequest hoặc Fetch API để gửi dữ liệu lên server
-        fetch('http://localhost:5000/addChartNotBelongProject', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Add chart successfully!')
-            } else {
-                console.error('Error adding chart:', data.message);
-                alert('An error occurred while adding the chart. Please try again.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred. Please try again.');
-        });
-    }
+            var chartName = document.getElementById('chart-name').value;
+            var chartType = document.getElementById('chart-type').value;
+            var inputData = document.getElementById('data-input').value;
+            var labelInput = document.getElementById('label-input').value;
+        
+            const urlParams = new URLSearchParams(window.location.search);
+            const project = urlParams.get('projectId');
+            var data = {
+                project: project,
+                chartData: {
+                    labels: labelInput.split(','),
+                    datasets: [
+                        {
+                            chartType: chartType,
+                            label: chartName,
+                            data: inputData.split(',').map(Number),
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.2)',
+                                'rgba(255, 159, 64, 0.2)',
+                                'rgba(255, 205, 86, 0.2)',
+                                'rgba(75, 192, 192, 0.2)',
+                                'rgba(54, 162, 235, 0.2)',
+                                'rgba(153, 102, 255, 0.2)',
+                                'rgba(201, 203, 207, 0.2)'
+                            ],
+                            borderColor: [
+                                'rgb(255, 99, 132)',
+                                'rgb(255, 159, 64)',
+                                'rgb(255, 205, 86)',
+                                'rgb(75, 192, 192)',
+                                'rgb(54, 162, 235)',
+                                'rgb(153, 102, 255)',
+                                'rgb(201, 203, 207)'
+                            ],
+                            borderWidth: 2
+                        }
+                    ]
+                },
+            };
+        
+            // Kiểm tra nếu projectId không tồn tại trong URL thì gửi lên endpoint cho biểu đồ không thuộc project nào
+            var endpoint = (project ? 'http://localhost:5000/addChartBelongProject' : 'http://localhost:5000/addChartNotBelongProject');
+        
+            // Sử dụng XMLHttpRequest hoặc Fetch API để gửi dữ liệu lên server
+            fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Add chart successfully!')
+                } else {
+                    console.error('Error adding chart:', data.message);
+                    alert('An error occurred while adding the chart. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        }
     </script>
 </body>
 </html>

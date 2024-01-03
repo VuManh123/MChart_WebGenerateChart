@@ -87,7 +87,7 @@
                 </div>
             </div>
             
-            <div class="popup-container">
+            <a class="popup-container" id="addChartBtn">
                 <button class="addProject">
                   <div class="iconAdd">
                     <ion-icon name="add-outline"></ion-icon>
@@ -96,7 +96,7 @@
                     <div>Add Chart</div>
                   </div>
                 </button>
-            </div>
+            </a>
 
             <div class="ListChart">
                 <h4>----- My charts -----</h4>
@@ -140,6 +140,18 @@
         }
         list.forEach((item) =>
         item.addEventListener('mouseover', activeLink));
+    </script>
+
+    <script>
+        // Lấy projectId từ URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const projectId = urlParams.get('projectId');
+    
+        // Lắng nghe sự kiện click trên nút
+        document.getElementById('addChartBtn').addEventListener('click', function() {
+        // Chuyển hướng trang với projectId
+        window.location.href = `/addChart.html?projectId=${projectId}`;
+        });
     </script>
 
     <script>
