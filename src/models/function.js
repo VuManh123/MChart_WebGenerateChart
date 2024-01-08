@@ -193,7 +193,6 @@ function viewFileInfo(projectID) {
 }
 
 function handleFileUpload() {
-    // Trigger the click event on the file input element
     document.getElementById('file-input').click();
 }
 
@@ -225,3 +224,164 @@ function handleFileChange(event) {
     }
 }
 
+function showChartOptions(event, projectID) {
+    event.preventDefault();
+    event.stopPropagation();
+    closeChartPopups();
+
+    var popup = document.getElementById(`popupChart-${projectID}`);
+    var ellipsisIcon = event.target;
+
+    var topPosition = ellipsisIcon.offsetTop + ellipsisIcon.offsetHeight;
+    var leftPosition = ellipsisIcon.offsetLeft;
+
+    popup.style.top = topPosition + "px";
+    popup.style.left = leftPosition + "px";
+    popup.style.display = "block";
+}
+
+function closeChartPopups() {
+    var popups = document.querySelectorAll('.popupChart');
+    popups.forEach(function(popup) {
+        popup.style.display = "none";
+    });
+}
+
+// Function rename, update, share, remove, view info Chart
+function viewInfoChart(chartID) {
+    fetch('http://localhost:5000/listInfoChart', {
+        method: 'POST', 
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ chartID: chartID }), // Include projectID in the request body if needed
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    
+    .then(function(chartInfo) {
+        alert(`Chart Name: ${chartInfo[0].ChartName}\nCreate Date: ${chartInfo[0].CreateAt}\nCheckpoint: ${chartInfo[0].CheckpointDescription} at time: ${chartInfo[0].CheckpointDate}`);
+    })
+    .catch(function(error) {
+        console.error('Error fetching chart information:', error);
+        alert('An error occurred while fetching chart information.');
+    });
+}
+function renameChart(chartID) {
+    var newChartName = prompt('Enter the new name for the chart:');
+    
+    if (newChartName !== null && newChartName !== '') {
+        fetch('http://localhost:5000/updateNameChart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                chartID: chartID,
+                chartNewName: newChartName,
+            }),
+        })
+        .then(response => response.json())
+        .then(function(result) {
+            if (result.success) {
+                // Update the project name in the UI
+                var projectElement = document.querySelector(`.chart-container[data-chart-id="${chartID}"] .chart-title`);
+                projectElement.textContent = newChartName;
+
+                alert(result.message);
+            } else {
+                alert('Error updating chart name. Please try again.');
+            }
+        })
+        .catch(function(error) {
+            console.error('Error updating chart name:', error);
+            alert('An error occurred while updating the chart name.');
+        });
+    }
+    else {
+        alert('The new name of chart is empty. Update fail!')
+    }
+}
+function confirmAndRemoveChart(chartID) {
+    const isConfirmed = window.confirm('Are you sure you want to delete this chart?');
+
+    if (isConfirmed) {
+        removeChart(chartID);
+    }
+}
+function removeChart(chartID) {
+    fetch('http://localhost:5000/removeChart', {
+        method: 'POST', // Use POST method
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ chartID: chartID }), // Include projectID in the request body
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(function(result) {
+        if (result.success) {
+            alert(result.message);
+        } else {
+            alert(result.message);
+        }
+    })
+    .catch(function(error) {
+        console.error('Error removing chart:', error);
+        alert('An error occurred while removing the chart.');
+    });
+}
+async function shareChart(chartID) {
+    // Define roles for the combobox
+    const roles = ['view', 'edit'];
+
+    // Show a custom dialog for input
+    const dialogHtml = `
+        <div class="label-container">
+            <label for="role">Select Role:</label>
+            <select id="role">${roles.map(role => `<option value="${role}">${role}</option>`).join('')}</select>
+        </div>
+        <div class="label-container">
+            <label for="email">Enter Email:</label>
+            <input type="text" id="email" />
+        </div>
+    `;
+
+    const result = await showModalDialog('Share Chart', dialogHtml);
+
+    if (result) {
+        const { role, email } = result;
+        try {
+            const response = await fetch('http://localhost:5000/shareChart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    role: role,
+                    emailUser: email,
+                    chartID: chartID,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                alert('Share chart successfully!');
+            } else {
+                alert('Error sharing chart: ' + data.message);
+            }
+        } catch (error) {
+            console.error('Error sharing chart:', error);
+            alert('An error occurred while sharing chart.');
+        }
+    }
+}

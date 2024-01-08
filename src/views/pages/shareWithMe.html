@@ -192,5 +192,65 @@
         closeAllPopups();
     });
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+        // Lấy dữ liệu biểu đồ từ API
+        fetch('http://localhost:5000/chartSharedNotBelongProject')
+            .then(response => response.json())
+            .then(function (chartsData) {
+                // Lấy phần danh sách biểu đồ
+                var chartList = document.querySelector('.chart-list');
+
+                // Tạo các phần tử HTML cho từng biểu đồ
+                chartsData.forEach(function (chart) {
+                    var chartContainer = document.createElement('div');
+                    chartContainer.classList.add('chart-container');
+                    chartContainer.setAttribute('data-chart-id', chart.ChartID);
+
+                    // Tạo nội dung HTML cho biểu đồ
+                    var chartHTML = `
+                        <div class="chart-info">
+                            <div class="chart-title">${chart.ChartName}</div>
+                            <ion-icon name="ellipsis-vertical-outline" onclick="showChartOptions(event, '${chart.ChartID}')"></ion-icon>
+                        </div>
+                        <canvas id="${chart.ChartID}"></canvas>
+                        <div class="popupChart" id="popupChart-${chart.ChartID}">
+                            <div class="popupChart-content">
+                                <a href="#" onclick="renameChart('${chart.ChartID}')">Rename Chart</a>
+                                <a href="./editChart.html?chartID=${chart.ChartID}">Edit Chart</a>
+                                <a href="#" onclick="shareChart('${chart.ChartID}')">Share Chart</a>
+                                <a href="#" onclick="confirmAndRemoveChart('${chart.ChartID}')">Remove Chart</a>
+                                <a href="#" onclick="viewInfoChart('${chart.ChartID}')">View Info Chart</a>
+                            </div>
+                        </div>
+                    `;
+
+                    chartContainer.innerHTML = chartHTML;
+
+                    // Thêm biểu đồ vào danh sách
+                    chartList.appendChild(chartContainer);
+            
+                    var chartData = JSON.parse(chart.Data);
+                    
+                    var chartType = chartData.datasets[0].chartType || 'bar';
+                
+                    var ctx = document.getElementById(chart.ChartID).getContext('2d');
+                    new Chart(ctx, {
+                        type: chartType,
+                        data: chartData,
+                    });
+                });
+            })
+            .catch(function (error) {
+                console.error('Error fetching charts:', error);
+            });
+    });
+    </script>
+    <script>
+        document.addEventListener('click', function(event) {
+        closeAllPopups();
+        closeChartPopups();
+    });
+    </script>
 </body>
 </html>

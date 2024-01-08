@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MChart</title>
+    <link rel="stylesheet" type="text/css" href="../styles/style.css">
+    <link rel="shortcut icon" type="image/png" href="../images/Logo.png"/>
+</head>
+<body>
+    <div class="container">
+        <div class="navigation">
+            <ul>
+                <li>
+                    <a href="./index.html">
+                        <span class="icon"><ion-icon name="bar-chart-outline"></ion-icon></span>
+                        <span class="title">MChart</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="./index.html">
+                        <span class="icon"><ion-icon name="home-outline"></ion-icon></span>
+                        <span class="title">Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="./myProject.html">
+                        <span class="icon"><ion-icon name="folder-outline"></ion-icon></span>
+                        <span class="title">My Projects</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="./shareWithMe.html">
+                        <span class="icon"><ion-icon name="share-social-outline"></ion-icon></span>
+                        <span class="title">Shared With Me</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="./recently.html">
+                        <span class="icon"><ion-icon name="time-outline"></ion-icon></span>
+                        <span class="title">Recently</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="./recycleBin.html">
+                        <span class="icon"><ion-icon name="trash-bin-outline"></ion-icon></span>
+                        <span class="title">Recycle Bin</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="./help.html">
+                        <span class="icon"><ion-icon name="help-circle-outline"></ion-icon></span>
+                        <span class="title">Help</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="./settings.html">
+                        <span class="icon"><ion-icon name="settings-outline"></ion-icon></span>
+                        <span class="title">Settings</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="confirmSignOut()">
+                        <span class="icon"><ion-icon name="log-out-outline"></ion-icon></span>
+                        <span class="title">Sign Out</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- main -->
+        <div class="main">
+            <div class="topbar">
+                <div class="toggle">
+                    <ion-icon name="menu-outline"></ion-icon>
+                </div>
+                <div class="search">
+                    <label>
+                        <input type="text" placeholder="Enter infomation that you want ...">
+                        <ion-icon name="search-outline"></ion-icon>
+                    </label>
+                </div>
+
+                <!-- logo image -->
+                <div class="logo">
+                    <img src="../images/Logo.png">
+                </div>
+            </div>
+
+            <h3>Enter infomation and Show chart:</h3>
+
+            <form id="data-form">
+                <div class="input-row">
+                    <div class="input1">
+                        <li>
+                            <label for="chart-type">Chart type:</label>
+                            <select id="chart-type" required>
+                                <option value="line">Line Chart</option>
+                                <option value="bar">Bar Chart</option>
+                                <option value="pie">Pie Chart</option>
+                                <option value="doughnut">Dought Chart</option>
+                                <option value="radar">Radar Chart</option>
+                                <option value="polarArea">Polar Area Chart</option>
+                                <!-- Thêm các loại biểu đồ khác nếu cần -->
+                            </select>
+                        </li>
+                    </div>
+                    <div class="input1">
+                        <li>
+                            <label for="data-input">Enter data (separated by commas):</label>
+                            <input type="text" id="data-input" required>
+                        </li>
+                        <li>
+                            <label for="label-input">Enter label (separated by commas):</label>
+                            <input type="text" id="label-input" required>
+                        </li>
+                    </div>
+                </div>
+                <div>
+                    <button class="button-row" type="button" onclick="updateChart()">Show Chart</button>
+                </div>
+                <div>
+                    <button class="button-save" type="button" onclick="updateDataChart()">Update Chart</button>
+                </div>
+                <div>
+                    <button id="show-chart-button" class="button-save" type="button">Old Chart</button>
+                </div>
+            </form>
+
+            <div id="chart-container">
+                <p>Chart Updated</p>
+                <canvas id="myChart"></canvas>
+            </div>            
+        </div>
+    </div>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../../models/function.js"></script>
+    <script>
+        function confirmSignOut() {
+            var isConfirmed = confirm("Are you sure you want to sign out?");
+            if (isConfirmed) {
+                // Thực hiện các bước đăng xuất ở đây (ví dụ: chuyển hướng đến trang đăng nhập)
+                window.location.href = "login.html";
+            }
+        }
+    </script>
+
+    <script>
+        // Day thanh taskbar vao
+        let toggle = document.querySelector('.toggle');
+        let navigation = document.querySelector('.navigation');
+        let main = document.querySelector('.main');
+
+        toggle.onclick = function(){
+            navigation.classList.toggle('active')
+            main.classList.toggle('active')
+        }
+        // Co dinh hover cho thanh taskbar
+        let list = document.querySelectorAll('.navigation li');
+        function activeLink(){
+            list.forEach((item) =>
+            item.classList.remove('hovered'));
+            this.classList.add('hovered');
+        }
+        list.forEach((item) =>
+        item.addEventListener('mouseover', activeLink));
+
+        // Lắng nghe sự kiện khi trang đã được load
+document.addEventListener("DOMContentLoaded", function () {
+    // Lấy tham chiếu đến nút "Show Chart"
+    var showChartButton = document.getElementById("show-chart-button");
+
+    // Thêm sự kiện nghe cho nút
+    showChartButton.addEventListener("click", function () {
+        fetchChartData();
+    });
+});
+
+// Hàm fetch dữ liệu từ API
+function fetchChartData() {
+    // Lấy giá trị của chartID từ người dùng hoặc từ một nguồn khác
+    const urlParams = new URLSearchParams(window.location.search);
+            const chartID = urlParams.get('chartID');
+
+    // Sử dụng AJAX để fetch dữ liệu từ API
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", `http://localhost:5000/ChartByID?chartID=${chartID}`, true);
+
+    xhr.onload = function () {
+        if (xhr.status == 200) {
+            // Parse dữ liệu JSON nhận được từ API
+            var responseData = JSON.parse(xhr.responseText);
+
+            // Lấy dữ liệu từ responseData và đặt cho các ô dữ liệu trong form
+            setDataFields(responseData[0].Data);
+        } else {
+            console.error("Failed to fetch data from the server");
+        }
+    };
+
+    xhr.send();
+}
+
+// Hàm đặt giá trị cho các ô dữ liệu trong form
+function setDataFields(data) {
+    // Parse dữ liệu JSON từ chuỗi JSON trong response
+    var jsonData = JSON.parse(data);
+
+    // Đặt giá trị cho các ô dữ liệu trong form
+    document.getElementById("chart-type").value = jsonData.datasets[0].chartType;
+    document.getElementById("data-input").value = jsonData.datasets[0].data.join(",");
+    document.getElementById("label-input").value = jsonData.labels.join(",");
+}
+
+
+        var myChart;
+        // Hàm cập nhật biểu đồ
+        function updateChart() {
+            if (myChart) {
+                myChart.destroy();
+            } 
+            var chartType = document.getElementById('chart-type').value;
+            var inputData = document.getElementById('data-input').value;
+            var labelInput = document.getElementById('label-input').value;
+
+            var data = inputData.split(',').map(Number);
+            var labels = labelInput.split(',');
+            var ctx = document.getElementById('myChart').getContext('2d');
+            myChart = new Chart(ctx, {
+                type: chartType,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.2)',
+                            'rgba(255, 159, 64, 0.2)',
+                            'rgba(255, 205, 86, 0.2)',
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(54, 162, 235, 0.2)',
+                            'rgba(153, 102, 255, 0.2)',
+                            'rgba(201, 203, 207, 0.2)'
+                        ],
+                        borderColor: [
+                            'rgb(255, 99, 132)',
+                            'rgb(255, 159, 64)',
+                            'rgb(255, 205, 86)',
+                            'rgb(75, 192, 192)',
+                            'rgb(54, 162, 235)',
+                            'rgb(153, 102, 255)',
+                            'rgb(201, 203, 207)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: '#555',
+                                fontSize: 12
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#555',
+                                fontSize: 12
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Kích hoạt animation cho biểu đồ và tên biểu đồ
+            document.getElementById('chart-container').classList.add('show');
+        }
+    </script>
+
+    <script>
+        function updateDataChart() {
+            var chartType = document.getElementById('chart-type').value;
+            var inputData = document.getElementById('data-input').value;
+            var labelInput = document.getElementById('label-input').value;
+        
+            const urlParams = new URLSearchParams(window.location.search);
+            const chart = urlParams.get('chartID');
+            var data = {
+                chartID: chart,
+                chartData: {
+                    labels: labelInput.split(','),
+                    datasets: [
+                        {
+                            chartType: chartType,
+                            data: inputData.split(',').map(Number),
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.2)',
+                                'rgba(255, 159, 64, 0.2)',
+                                'rgba(255, 205, 86, 0.2)',
+                                'rgba(75, 192, 192, 0.2)',
+                                'rgba(54, 162, 235, 0.2)',
+                                'rgba(153, 102, 255, 0.2)',
+                                'rgba(201, 203, 207, 0.2)'
+                            ],
+                            borderColor: [
+                                'rgb(255, 99, 132)',
+                                'rgb(255, 159, 64)',
+                                'rgb(255, 205, 86)',
+                                'rgb(75, 192, 192)',
+                                'rgb(54, 162, 235)',
+                                'rgb(153, 102, 255)',
+                                'rgb(201, 203, 207)'
+                            ],
+                            borderWidth: 2
+                        }
+                    ]
+                },
+            };
+        
+            // Kiểm tra nếu projectId không tồn tại trong URL thì gửi lên endpoint cho biểu đồ không thuộc project nào
+            var endpoint = (chart ? 'http://localhost:5000/updateChart' : 'http://localhost:5000/updateChart');
+        
+            // Sử dụng XMLHttpRequest hoặc Fetch API để gửi dữ liệu lên server
+            fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Update chart successfully!')
+                } else {
+                    console.error('Error upading chart:', data.message);
+                    alert('An error occurred while updating the chart. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        }
+    </script>
+</body>
+</html>

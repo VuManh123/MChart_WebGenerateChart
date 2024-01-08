@@ -389,10 +389,17 @@ body
 
 #data-form {
     list-style-type: none;
+    margin-top: 20px;
+    margin-right: 30px;
+    margin-left: 30px;
     position: relative;
     display: flex;
     flex-wrap: wrap; /* Cho phép các ô chồng lên nhau khi không đủ không gian */
-    
+    background-color: #f4f4f4;
+    border: 1px solid var(--tim2);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 #data-form .input1 {
@@ -434,6 +441,7 @@ body
 
 .input-row {
     display: flex;
+    align-items: flex-start; /* Căn chỉnh theo đỉnh các phần tử con */
     justify-content: space-between;
     width: 100%;
 }
@@ -443,9 +451,14 @@ body
     margin-right: 15px; /* Khoảng cách giữa các ô */
 }
 
-.button-row {
+.button-row,
+.button-save,
+.button-upload {
+    margin-top:10px;
+    flex: 0 0 auto; /* Không co giãn, không co rút, giữ nguyên kích thước */
     position: relative;
     padding: 10px;
+    margin-left: 10px;
     border: 2px solid #6f268f; /* Đổi thành border có màu tương ứng */
     display: flex;
     border-radius: 5px; /* Bo tròn góc nút */
@@ -460,34 +473,10 @@ body
     color: #6f268f; /* Màu chữ khi di chuột qua */
 }
 
-.button-save {
-    position: relative;
-    padding: 10px;
-    margin-left: 10px;
-    border: 2px solid #6f268f; /* Đổi thành border có màu tương ứng */
-    display: flex;
-    border-radius: 5px; /* Bo tròn góc nút */
-    transition: background-color 0.3s ease, color 0.3s ease;
-    cursor: pointer;
-    background-color: #6f268f;
-    color: #fff; /* Màu chữ ban đầu */
-}
 
 .button-save:hover {
     background-color: #fff; /* Màu nền khi di chuột qua */
     color: #6f268f; /* Màu chữ khi di chuột qua */
-}
-.button-upload {
-    position: relative;
-    padding: 10px;
-    margin-left: 20px;
-    border: 2px solid #6f268f; /* Đổi thành border có màu tương ứng */
-    display: flex;
-    border-radius: 5px; /* Bo tròn góc nút */
-    transition: background-color 0.3s ease, color 0.3s ease;
-    cursor: pointer;
-    background-color: #6f268f;
-    color: #fff; /* Màu chữ ban đầu */
 }
 
 .button-upload:hover {
@@ -573,26 +562,26 @@ body
     border-bottom: 1px solid #ccc;  
     margin-left: 20px;
     margin-right: 20px;
-    padding-bottom: 5px;           /* Khoảng cách dưới */
-    margin-bottom: 8px;           /* Khoảng cách phía dưới */
+    padding-bottom: 5px;         
+    margin-bottom: 8px;         
     margin-top: 20px;
-    font-weight: normal;           /* Bỏ in đậm */            /* Kích thước chữ */
-    color: var(--tim2);                   /* Màu chữ */
+    font-weight: normal;         
+    color: var(--tim2);             
 }
 
 .chart-container {
     width: 390px;
     height: 430px;
-    display: inline-block; /* Hiển thị theo hàng ngang */
+    display: inline-block; 
     flex-wrap: wrap;
     margin: 20px 20px 20px 20px;
     box-sizing: border-box;
     border: 1px solid #6f268f;
     padding: 10px;
-    list-style: none; /* Ẩn dấu đầu dòng của thẻ li */
-    border-radius: 8px; /* Bo tròn góc của container */
-    background-color: #f8f3f7; /* Màu nền của container */
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); /* Đổ bóng cho container */
+    list-style: none; 
+    border-radius: 8px; 
+    background-color: #f8f3f7; 
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); 
   }
 
   canvas {
@@ -600,16 +589,23 @@ body
     height: auto !important;
   }
 
-  .chart-container li {
-    margin-bottom: 10px;
-    font-size: 16px; /* Kích thước chữ của tiêu đề */
-    font-weight: bold; /* Đậm chữ */
-    color: #6f268f; /* Màu chữ */
-  }
-  .chart-container ion-icon {
+  .chart-info {
+    display: flex;
+    align-items: center;
+}
+
+.chart-title {
+    margin-right: 10px; /* Khoảng cách giữa chart-title và ion-icon */
+    font-size: 16px;
+    font-weight: bold;
+    color: #6f268f;
+}
+
+.chart-info ion-icon {
     cursor: pointer;
     color: #6f268f;
-  }
+    margin-left: auto;
+}
 
   .project-link {
     text-decoration: none;
@@ -617,7 +613,7 @@ body
   .popupProject {
     display: none;
     position: absolute;
-    margin-left: 90px;
+    margin-left: 70px;
     background-color: #f9f9f9;
     border: 1px solid var(--tim2);
     border-radius: 8px;
@@ -683,4 +679,29 @@ select, input {
     flex: 1;
     padding: 8px;
     margin: 0;
+}
+.popupChart {
+    display: none;
+    position: absolute;
+    margin-top: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid var(--tim2);
+    border-radius: 8px;
+    padding: 10px;
+    z-index: 1;
+}
+
+.popupChart-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.popupChart-content a {
+    padding: 5px;
+    text-decoration: none;
+    color: #333;
+}
+.popupChart-content a:hover {
+    background: var(--white1);
+    border-radius: 8px;
 }

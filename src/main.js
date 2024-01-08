@@ -333,21 +333,25 @@ app.post('/shareProject', async (req, res) => {
 
     const checkResult = await sql.query(checkQuery);
 
-    // Truy cập giá trị của thuộc tính '' trong đối tượng đầu tiên của recordset
-    const exists = checkResult.recordset[0][''];
+    if (checkResult.recordset.length === 0) {
+      // Nếu không có kết quả, kiểm tra quyền INSERT
+      try {
+        const insertQuery = `
+          INSERT INTO ProjectShares (ProjectID, SharedByUserID, SharedWithUserID, AccessLevel)
+          VALUES (N'${projectID}', (SELECT UserID FROM Users WHERE UserName = '${userName}'), (SELECT UserID FROM Users WHERE Email = '${emailUser}'), N'${role}')
+        `;
 
-    if (exists) {
-      res.json({ success: false, message: 'Project already shared with the specified user.' });
+        await sql.query(insertQuery);
+
+        res.json({ success: true, message: 'Share project successfully!' });
+      } catch (insertError) {
+        // Xử lý lỗi INSERT
+        console.log('Error inserting into ProjectShares:', insertError);
+        res.json({ success: false, message: 'Update role "master" to share projects' });
+      }
     } else {
-      // Nếu không tồn tại, thực hiện insert
-      const insertQuery = `
-        INSERT INTO ProjectShares (ProjectID, SharedByUserID, SharedWithUserID, AccessLevel)
-        VALUES (N'${projectID}', (SELECT UserID FROM Users WHERE UserName = '${userName}'), (SELECT UserID FROM Users WHERE Email = '${emailUser}'), N'${role}')
-      `;
-
-      await sql.query(insertQuery);
-
-      res.json({ success: true, message: 'Share project successfully!' });
+      // Nếu có kết quả, thông báo rằng dự án đã được chia sẻ
+      res.json({ success: false, message: 'Project already shared with the specified user.' });
     }
   } catch (error) {
     console.log('Error sharing projects:', error);
@@ -509,10 +513,11 @@ app.post('/removeChart', (req, res) => {
 });
 // 19. Rename chart
 app.post('/updateNameChart', (req, res) => {
-  const chartID = req.body.chartId;
+  const chartID = req.body.chartID;
   const chartNewName = req.body.chartNewName;
+  console.log('Update name for chart: ', chartID)
   
-  const query = `UPDATE Charts SET ChartName = N'${chartNewName}'`;
+  const query = `UPDATE Charts SET ChartName = N'${chartNewName}' WHERE ChartID ='${chartID}'`;
   sql.query(query)
       .then(() => {
         res.json({ success: true, message: 'Update chart name successfully!' });
@@ -527,39 +532,72 @@ app.post('/updateNameChart', (req, res) => {
     try {
       const role = req.body.role;
       const emailUser = req.body.emailUser;
-      const projectID = req.body.projectID;
+      const chartID = req.body.chartID;
       const userName = req.session.userName;
   
       // Kiểm tra xem đã tồn tại bản ghi hay chưa
       const checkQuery = `
         SELECT 1
         FROM ChartShares
-        WHERE ChartID = N'${projectID}'
+        WHERE ChartID = N'${chartID}'
           AND SharedByUserID = (SELECT UserID FROM Users WHERE UserName = '${userName}')
           AND SharedWithUserID = (SELECT UserID FROM Users WHERE Email = '${emailUser}')
           AND AccessLevel = N'${role}'
       `;
   
       const checkResult = await sql.query(checkQuery);
-  
-      // Truy cập giá trị của thuộc tính '' trong đối tượng đầu tiên của recordset
-      const exists = checkResult.recordset[0][''];
-  
-      if (exists) {
-        res.json({ success: false, message: 'Chart already shared with the specified user.' });
-      } else {
-        // Nếu không tồn tại, thực hiện insert
-        const insertQuery = `
+
+      if (checkResult.recordset.length === 0) {
+        // Nếu không có kết quả, kiểm tra quyền INSERT
+        try {
+          const insertQuery = `
           INSERT INTO ChartShares (ChartID, SharedByUserID, SharedWithUserID, AccessLevel)
           VALUES (N'${chartID}', (SELECT UserID FROM Users WHERE UserName = '${userName}'), (SELECT UserID FROM Users WHERE Email = '${emailUser}'), N'${role}')
         `;
-  
-        await sql.query(insertQuery);
-  
-        res.json({ success: true, message: 'Share chart successfully!' });
+
+          await sql.query(insertQuery);
+
+          res.json({ success: true, message: 'Share chart successfully!' });
+        } catch (insertError) {
+          // Xử lý lỗi INSERT
+          console.log('Error inserting into ChartShares:', insertError);
+          res.json({ success: false, message: 'Update role "master" to share charts' });
+        }
+      } else {
+        // Nếu có kết quả, thông báo rằng dự án đã được chia sẻ
+        res.json({ success: false, message: 'Chart already shared with the specified user.' });
       }
     } catch (error) {
       console.log('Error sharing chart:', error);
-      res.status(500).json({ success: false, message: 'Có lỗi xảy ra khi share chart' });
+      res.status(500).json({ success: false, message: 'Have an error while sharing this chart!' });
     }
   });
+  // 21. View info chart
+app.post('/listInfoChart', (req, res) => {
+  const chartID = req.body.chartID;
+  console.log('Received projectID:', chartID);
+  const query = `SELECT c.ChartName, c.CreateAt, cp.Description AS CheckpointDescription, cp.CheckpointDate FROM Charts c LEFT JOIN CheckPoints cp ON c.ChartID = cp.ChartID WHERE c.ChartID = '${chartID}'`;
+  sql.query(query)
+    .then((result) => {
+      res.json(result.recordset);
+    })
+    .catch((error) => {
+      console.log('Error executing SQL query:', error);
+      res.status(500).send('Internal Server Error');
+    });
+});
+
+// 22. Select chart by id:
+app.get('/ChartByID', (req, res) => {
+  const chartID = req.query.chartID; // Sử dụng req.query để lấy tham số từ query string
+
+  const query = `SELECT Data FROM Charts WHERE ChartID ='${chartID}'`;
+  sql.query(query)
+    .then((result) => {
+      res.json(result.recordset);
+    })
+    .catch((error) => {
+      console.log('Error executing SQL query:', error);
+      res.status(500).send('Internal Server Error');
+    });
+});
