@@ -87,7 +87,7 @@
                 </div>
             </div>
             
-            <div class="popup-container">
+            <a class="popup-container" id="addChartBtn">
                 <button class="addProject">
                   <div class="iconAdd">
                     <ion-icon name="add-outline"></ion-icon>
@@ -96,7 +96,7 @@
                     <div>Add Chart</div>
                   </div>
                 </button>
-            </div>
+            </a>
 
             <div class="ListChart">
                 <h4>----- My charts -----</h4>
@@ -111,6 +111,7 @@
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../../models/chart.js"></script>
+    <script src="../../models/function.js"></script>
     <script>
         function confirmSignOut() {
             var isConfirmed = confirm("Are you sure you want to sign out?");
@@ -142,6 +143,39 @@
         item.addEventListener('mouseover', activeLink));
     </script>
 
+<script>
+    // Lấy projectId từ URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const projectId = urlParams.get('projectId');
+
+    // Lắng nghe sự kiện click trên nút
+    document.getElementById('addChartBtn').addEventListener('click', function() {
+        // Fetch the projects data
+        fetch('http://localhost:5000/projectsShared')
+            .then(response => response.json())
+            .then(function(projectsData) {
+                // Find the project with the matching projectId
+                const project = projectsData.find(proj => proj.ProjectID === projectId);
+
+                // Check if the project is found
+                if (project) {
+                    // Check if the role is 'view'
+                    if (project.AccessLevel === 'view') {
+                        alert('You do not have permission to add charts to this project.');
+                    } else {
+                        // Chuyển hướng trang với projectId
+                        window.location.href = `/addChart.html?projectId=${projectId}`;
+                    }
+                } else {
+                    console.error('Project not found');
+                }
+            })
+            .catch(function(error) {
+                console.error('Error fetching projects:', error);
+            });
+    });
+</script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Lấy projectID từ URL
@@ -151,52 +185,60 @@
             // Kiểm tra xem projectID có tồn tại không
             if (projectId) {
                 // Gọi API để lấy danh sách chart thuộc dự án có projectID
-                fetch(`http://localhost:5000/chartSharedBelongProject/${projectId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        // Duyệt qua từng chart và tạo biểu đồ
-                        data.forEach(chart => {
-                        // Tạo container cho biểu đồ
-                        var chartContainer = document.createElement('div');
-                        chartContainer.className = 'chart-container';
-                    
-                        // Tạo tiêu đề cho biểu đồ
-                        var chartTitle = document.createElement('li');
-                        chartTitle.textContent = chart.ChartName;
-                        chartContainer.appendChild(chartTitle);
+                fetch(`http://localhost:5000/chartBelongProject/${projectId}`)
+                .then(response => response.json())
+                    .then(function (chartsData) {
+                        var chartList = document.querySelector('.chart-list');
 
-                        // Tạo biểu tượng ion-icon
-                        var ellipsisIcon = document.createElement('ion-icon');
-                        ellipsisIcon.setAttribute('name', 'ellipsis-vertical-outline');
-                        ellipsisIcon.style.float = 'right'; // Đặt nó sang phải
-                        chartTitle.appendChild(ellipsisIcon);
-                    
-                        // Tạo canvas cho biểu đồ
-                        var canvas = document.createElement('canvas');
-                        canvas.id = chart.ChartID;
-                        chartContainer.appendChild(canvas);
-                    
-                        // Thêm container vào danh sách
-                        document.querySelector('.chart-list').appendChild(chartContainer);
-                    
-                        // Pars data từ chuỗi JSON trong trường 'Data'
-                        var chartData = JSON.parse(chart.Data);
-                        
-                        // Kiểm tra xem có trường 'chartType' không
-                        var chartType = chartData.datasets[0].chartType || 'bar';
-                    
-                        // Thêm biểu đồ bằng Chart.js với loại biểu đồ tương ứng
-                        var ctx = document.getElementById(chart.ChartID).getContext('2d');
-                        new Chart(ctx, {
-                            type: chartType,
-                            data: chartData,
+                        // Tạo các phần tử HTML cho từng biểu đồ
+                        chartsData.forEach(function (chart) {
+                            var chartContainer = document.createElement('div');
+                            chartContainer.classList.add('chart-container');
+                            chartContainer.setAttribute('data-chart-id', chart.ChartID);
+
+                            // Tạo nội dung HTML cho biểu đồ
+                            var chartHTML = `
+                                <div class="chart-info">
+                                    <div class="chart-title">${chart.ChartName}</div>
+                                    <ion-icon name="ellipsis-vertical-outline" onclick="showChartShareProjectOptions(event, '${chart.ChartID}', '${projectId}')"></ion-icon>
+                                </div>
+                                <canvas id="${chart.ChartID}"></canvas>
+                                <div class="popupChart" id="popupChart-${chart.ChartID}">
+                                    <div class="popupChart-content">
+                                        <a href="#" onclick="renameChart('${chart.ChartID}')">Rename Chart</a>
+                                        <a href="./editChart.html?chartID=${chart.ChartID}">Edit Chart</a>
+                                        <a href="#" onclick="viewInfoChart('${chart.ChartID}')">View Info Chart</a>
+                                    </div>
+                                </div>
+                            `;
+
+                            chartContainer.innerHTML = chartHTML;
+
+                            // Thêm biểu đồ vào danh sách
+                            chartList.appendChild(chartContainer);
+
+                            var chartData = JSON.parse(chart.Data);
+                            
+                            var chartType = chartData.datasets[0].chartType || 'bar';
+
+                            var ctx = document.getElementById(chart.ChartID).getContext('2d');
+                            new Chart(ctx, {
+                                type: chartType,
+                                data: chartData,
+                            });
                         });
-                        });
+                    })
+                    .catch(function (error) {
+                        console.error('Error fetching charts:', error);
                     });
-            } else {
-                console.error('No projectId found in the URL');
             }
         });
+    </script>
+    <script>
+        document.addEventListener('click', function(event) {
+        closeAllPopups();
+        closeChartPopups();
+    });
     </script>
 </body>
 </html>

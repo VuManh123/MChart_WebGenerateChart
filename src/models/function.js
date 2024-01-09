@@ -385,3 +385,107 @@ async function shareChart(chartID) {
         }
     }
 }
+function showChartShareOptions(event, chartID) {
+    event.preventDefault();
+    event.stopPropagation();
+    closeChartPopups();
+
+    // Fetch the role for the specific chart
+    fetch('http://localhost:5000/chartSharedNotBelongProject')
+        .then(response => response.json())
+        .then(function(chartsData) {
+            // Find the chart with the matching chartID
+            const chart = chartsData.find(ch => ch.ChartID === chartID);
+
+            // Check if the chart is found
+            if (chart) {
+                // Check if the access level is 'view', and if so, don't show options
+                if (chart.AccessLevel === 'view') {
+                    alert('You do not have permission to perform this action.');
+                } else {
+                    // Show the options if the access level is not 'view'
+                    var popup = document.getElementById(`popupChart-${chartID}`);
+                    var ellipsisIcon = event.target;
+
+                    var topPosition = ellipsisIcon.offsetTop + ellipsisIcon.offsetHeight;
+                    var leftPosition = ellipsisIcon.offsetLeft;
+
+                    popup.style.top = topPosition + "px";
+                    popup.style.left = leftPosition + "px";
+                    popup.style.display = "block";
+                }
+            } else {
+                console.error('Chart not found');
+            }
+        })
+        .catch(function(error) {
+            console.error('Error fetching charts:', error);
+        });
+}
+function showProjectShareOptions(event, projectID) {
+    event.preventDefault();
+    event.stopPropagation();
+    closeAllPopups();
+
+    // Fetch the role for the specific project
+    fetch('http://localhost:5000/projectsShared')
+        .then(response => response.json())
+        .then(function(projectsData) {
+            // Find the project with the matching projectID
+            const project = projectsData.find(proj => proj.ProjectID === projectID);
+
+            // Check if the project is found
+            if (project) {
+                // Check if the role is 'view', and if so, don't show options
+                if (project.AccessLevel === 'view') {
+                    alert('You do not have permission to perform this action.');
+                } else {
+                    // Show the options if the role is not 'view'
+                    var popup = document.getElementById(`popupProject-${projectID}`);
+                    popup.style.display = "block";
+                }
+            } else {
+                console.error('Project not found');
+            }
+        })
+        .catch(function(error) {
+            console.error('Error fetching projects:', error);
+        });
+}
+function showChartShareProjectOptions(event, chartID, projectID) {
+    event.preventDefault();
+    event.stopPropagation();
+    closeChartPopups();
+
+    // Fetch the projects data
+    fetch('http://localhost:5000/projectsShared')
+        .then(response => response.json())
+        .then(function(projectsData) {
+            // Find the project with the matching projectID
+            const project = projectsData.find(proj => proj.ProjectID === projectID);
+
+            // Check if the project is found
+            if (project) {
+                // Check if the role is 'view'
+                if (project.AccessLevel === 'view') {
+                    alert('You do not have permission to perform this action.');
+                } else {
+                    // Show the options if the role is not 'view'
+                    var popup = document.getElementById(`popupChart-${chartID}`);
+                    var ellipsisIcon = event.target;
+
+                    var topPosition = ellipsisIcon.offsetTop + ellipsisIcon.offsetHeight;
+                    var leftPosition = ellipsisIcon.offsetLeft;
+
+                    popup.style.top = topPosition + "px";
+                    popup.style.left = leftPosition + "px";
+                    popup.style.display = "block";
+                }
+            } else {
+                console.error('Project not found');
+            }
+        })
+        .catch(function(error) {
+            console.error('Error fetching projects:', error);
+        });
+}

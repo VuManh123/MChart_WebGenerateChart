@@ -231,6 +231,8 @@ body
 .cardBox
 {
     position: relative;
+    display: flex;
+    flex-wrap: wrap;
     width: 100%;
     padding: 20px;
     display: grid;
@@ -277,18 +279,17 @@ body
     color: var(--white);
 }
 
-.charts 
-{
+.charts {
     display: grid;
-    grid-template-columns: 2fr 1fr 2fr;
+
+    grid-template-rows: auto; /* Set the rows to adjust their height based on content */
     grid-gap: 20px;
     width: 100%;
     padding: 20px;
     padding-top: 0;
 }
 
-.chart
-{
+.chart {
     background: #fff;
     padding: 20px;
     border-radius: 10px;

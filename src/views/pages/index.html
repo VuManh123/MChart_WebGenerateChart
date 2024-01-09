@@ -90,7 +90,7 @@
             <div class="cardBox">
                 <div class="card">
                     <div>
-                        <div class="numbers">50</div>
+                        <div class="numbers" id="projectCount"></div>
                         <div class="cardName">My projects</div>
                     </div>
                     <div class="iconBox">
@@ -99,7 +99,7 @@
                 </div>
                 <div class="card">
                     <div>
-                        <div class="numbers">99</div>
+                        <div class="numbers" id="chartCount"></div>
                         <div class="cardName">My charts</div>
                     </div>
                     <div class="iconBox">
@@ -108,7 +108,7 @@
                 </div>
                 <div class="card">
                     <div>
-                        <div class="numbers">39</div>
+                        <div class="numbers" id="shareWithMeCount"></div>
                         <div class="cardName">Shared With Me</div>
                     </div>
                     <div class="iconBox">
@@ -117,7 +117,7 @@
                 </div>
                 <div class="card">
                     <div>
-                        <div class="numbers">80</div>
+                        <div class="numbers" id="myShareCount"></div>
                         <div class="cardName">My Share</div>
                     </div>
                     <div class="iconBox">
@@ -157,6 +157,21 @@
                 window.location.href = "login.html";
             }
         }
+    </script>
+    <script>
+        // Fetch data from the server
+        fetch('http://localhost:5000/sumByUser')
+            .then(response => response.json())
+            .then(result => {
+                // Set values in the HTML
+                document.getElementById('projectCount').innerText = result.ProjectCount;
+                document.getElementById('chartCount').innerText = result.ChartCount;
+                document.getElementById('shareWithMeCount').innerText = result.ShareByUserCount; // Note: ShareWithMe uses ShareByUserCount
+                document.getElementById('myShareCount').innerText = result.ShareWithUserCount; // Note: MyShare uses ShareWithUserCount
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
     </script>
 
     <script>

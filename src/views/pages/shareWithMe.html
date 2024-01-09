@@ -164,14 +164,14 @@
                                     </div>
                                     <div class="project-name">${project.ProjectName}</div>
                                     <div class="more-info">
-                                        <ion-icon name="ellipsis-vertical-outline" onclick="showOptions(event, '${project.ProjectID}')"></ion-icon>
+                                        <ion-icon name="ellipsis-vertical-outline" onclick="showProjectShareOptions(event, '${project.ProjectID}')"></ion-icon>
                                     </div>
                                 </div>
                             </a>
                             <div class="popupProject" id="popupProject-${project.ProjectID}">
                                 <div class="popupProject-content">
-                                    <a href="#" onclick="renameProjectShare('${project.ProjectID}')">Rename</a>
-                                    <a href="#" onclick="viewFileInfoShare('${project.ProjectID}')">View File Info</a>
+                                    <a href="#" onclick="renameProject('${project.ProjectID}')">Rename Project</a>
+                                    <a href="#" onclick="viewFileInfo('${project.ProjectID}')">View Project Info</a>
                                 </div>
                             </div>              
                         `;
@@ -211,15 +211,13 @@
                     var chartHTML = `
                         <div class="chart-info">
                             <div class="chart-title">${chart.ChartName}</div>
-                            <ion-icon name="ellipsis-vertical-outline" onclick="showChartOptions(event, '${chart.ChartID}')"></ion-icon>
+                            <ion-icon name="ellipsis-vertical-outline" onclick="showChartShareOptions(event, '${chart.ChartID}')"></ion-icon>
                         </div>
                         <canvas id="${chart.ChartID}"></canvas>
                         <div class="popupChart" id="popupChart-${chart.ChartID}">
                             <div class="popupChart-content">
                                 <a href="#" onclick="renameChart('${chart.ChartID}')">Rename Chart</a>
                                 <a href="./editChart.html?chartID=${chart.ChartID}">Edit Chart</a>
-                                <a href="#" onclick="shareChart('${chart.ChartID}')">Share Chart</a>
-                                <a href="#" onclick="confirmAndRemoveChart('${chart.ChartID}')">Remove Chart</a>
                                 <a href="#" onclick="viewInfoChart('${chart.ChartID}')">View Info Chart</a>
                             </div>
                         </div>

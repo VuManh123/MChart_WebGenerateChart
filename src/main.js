@@ -430,7 +430,7 @@ app.get('/projectsShared', (req, res) => {
 // 14. View chartShared not belongs to project
 app.get('/chartSharedNotBelongProject', (req, res) => {
   const userName = req.session.userName;
-  const query = `SELECT * FROM ChartShares cs JOIN Charts c ON cs.ChartID = c.ChartID WHERE cs.SharedWithUserID = (SELECT UserID FROM Users WHERE UserName = '${userName}') AND ProjectID IS NULL`;
+  const query = `SELECT c.ChartID, c.ChartName, c.Data, c.CreateAt, c.ProjectID, cs.SharedByUserID, cs.SharedWithUserID, cs.AccessLevel, cs.ShareDate FROM ChartShares cs JOIN Charts c ON cs.ChartID = c.ChartID LEFT JOIN ProjectShares p ON c.ProjectID = p.ProjectID WHERE cs.SharedWithUserID = (SELECT UserID FROM Users WHERE UserName = '${userName}') AND p.ProjectID IS NULL`;
   sql.query(query)
     .then((result) => {
       res.json(result.recordset);
@@ -600,4 +600,64 @@ app.get('/ChartByID', (req, res) => {
       console.log('Error executing SQL query:', error);
       res.status(500).send('Internal Server Error');
     });
+});
+
+// 24. Thong ke
+app.get('/sumByUser', async (req, res) => {
+  try {
+    const userName = req.session.userName;
+
+    // Fetch UserID based on UserName
+    const userQuery = `SELECT UserID FROM Users WHERE UserName = '${userName}'`;
+    const userResult = await sql.query(userQuery);
+    const userID = userResult.recordset[0].UserID;
+
+    // Count of Projects
+    const projectQuery = `SELECT COUNT(*) AS ProjectCount FROM Projects WHERE UserID = '${userID}'`;
+    const projectResult = await sql.query(projectQuery);
+
+    // Count of Charts
+    const chartQuery = `SELECT COUNT(*) AS ChartCount FROM Charts WHERE UserID = '${userID}'`;
+    const chartResult = await sql.query(chartQuery);
+
+    // Count of ShareByUser
+    const shareByUserQuery = `
+      SELECT COUNT(*) AS ShareByUserCount
+      FROM (
+          SELECT DISTINCT SharedByUserID
+          FROM ProjectShares
+          WHERE SharedByUserID = '${userID}'
+          UNION
+          SELECT DISTINCT SharedByUserID
+          FROM ChartShares
+          WHERE SharedByUserID = '${userID}'
+      ) AS ShareByUser`;
+    const shareByUserResult = await sql.query(shareByUserQuery);
+
+    // Count of ShareWithUser
+    const shareWithUserQuery = `
+      SELECT COUNT(*) AS ShareWithUserCount
+      FROM (
+          SELECT DISTINCT SharedWithUserID
+          FROM ProjectShares
+          WHERE SharedWithUserID = '${userID}'
+          UNION
+          SELECT DISTINCT SharedWithUserID
+          FROM ChartShares
+          WHERE SharedWithUserID = '${userID}'
+      ) AS ShareWithUser`;
+    const shareWithUserResult = await sql.query(shareWithUserQuery);
+
+    const result = {
+      ProjectCount: projectResult.recordset[0].ProjectCount,
+      ChartCount: chartResult.recordset[0].ChartCount,
+      ShareByUserCount: shareByUserResult.recordset[0].ShareByUserCount,
+      ShareWithUserCount: shareWithUserResult.recordset[0].ShareWithUserCount,
+    };
+
+    res.json(result);
+  } catch (error) {
+    console.log('Error executing SQL query:', error);
+    res.status(500).send('Internal Server Error');
+  }
 });
